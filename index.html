@@ -376,6 +376,263 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
 .pkey-clr{color:var(--rd)}
 .pkey-go{background:var(--dk);color:#fff;border-color:var(--dk)}
 .pkey-go:hover{background:var(--dk2,var(--dk));filter:brightness(1.1)}
+
+
+/* ══════════════════════════════════════════
+   MOBILE RESPONSIVE — Compact & Card-based
+══════════════════════════════════════════ */
+
+/* Hamburger — hidden desktop */
+#menuToggle{display:none;position:fixed;top:10px;left:10px;z-index:600;background:var(--ink);color:#fff;border:none;border-radius:10px;width:40px;height:40px;font-size:18px;cursor:pointer;align-items:center;justify-content:center;box-shadow:var(--sh3)}
+#sbOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:490}
+
+/* Mobile cards — hidden on desktop */
+.mob-cards{display:none}
+.mob-secondary{display:none} /* secondary page btns hidden on mobile */
+
+@media(max-width:768px){
+  /* ─ Global ─ */
+  body{font-size:14px}
+  #menuToggle{display:flex}
+
+  /* ─ Sidebar ─ */
+  .sidebar{position:fixed;left:-240px;top:0;bottom:0;z-index:500;width:230px;transition:left .25s;overflow-y:auto}
+  .sidebar.open{left:0}
+  #sbOverlay.open{display:block}
+
+  /* ─ Main ─ */
+  .main{margin-left:0;padding:58px 12px 80px}
+
+  /* ─ Page header ─ */
+  .ph{flex-direction:row;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:nowrap}
+  .pt{font-size:18px;font-weight:700;white-space:nowrap}
+  .pt-sub{display:none} /* hide subtitle on mobile */
+  .ph-r{flex-shrink:0;gap:6px}
+  /* Hide secondary buttons on mobile (template, export, import, scan) */
+  .mob-secondary{display:none!important}
+
+  /* ─ Stats: 2 col compact ─ */
+  .sr{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .sc{padding:12px 14px}
+  .sl{font-size:9.5px}
+  .sv{font-size:20px}
+  .sc-ch{font-size:11px}
+
+  /* ─ Search/filter card ─ */
+  .card.mb4 .card-b>div{display:flex!important;flex-direction:column;gap:8px}
+  .card.mb4 select.fc{font-size:13px}
+
+  /* ─ Hide desktop tables on mobile, show cards ─ */
+  .mob-hide{display:none!important}
+  .mob-cards{display:flex;flex-direction:column;gap:8px;padding:4px 2px 8px}
+
+  /* ─ Product card ─ */
+  .m-prod-card{background:var(--card);border:1px solid var(--bord);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;box-shadow:var(--sh)}
+  .m-prod-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .m-prod-name{font-size:14px;font-weight:700;color:var(--ink);line-height:1.3;flex:1}
+  .m-prod-brand{font-size:11.5px;color:var(--ink3);margin-top:1px}
+  .m-prod-prices{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;background:var(--surf);border-radius:8px;padding:8px 10px}
+  .m-price-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3)}
+  .m-price-val{font-size:13.5px;font-weight:700;font-family:var(--fm)}
+  .m-price-val.rp{color:var(--gn)}.m-price-val.wp{color:var(--gold)}.m-price-val.pp{color:var(--ink2)}
+  .m-prod-actions{display:flex;gap:8px;align-items:center}
+  .m-bc{font-size:10px;color:var(--ink3);font-family:var(--fm);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* ─ Sale card ─ */
+  .m-sale-card{background:var(--card);border:1px solid var(--bord);border-radius:12px;padding:12px 14px;box-shadow:var(--sh)}
+  .m-sale-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+  .m-sale-inv{font-size:11px;color:var(--ink3);font-family:var(--fm)}
+  .m-sale-total{font-size:18px;font-weight:700;color:var(--gn);font-family:var(--fm)}
+  .m-sale-cust{font-size:14px;font-weight:600;color:var(--ink)}
+  .m-sale-meta{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
+  .m-sale-date{font-size:11.5px;color:var(--ink3)}
+  .m-sale-actions{display:flex;gap:8px;margin-top:10px}
+
+  /* ─ Cat/Brand/Unit cards ─ */
+  .m-master-card{background:var(--card);border:1px solid var(--bord);border-radius:10px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sh)}
+  .m-master-name{font-size:14px;font-weight:600;color:var(--ink)}
+  .m-master-count{font-size:11.5px;color:var(--ink3);margin-top:1px}
+
+  /* ─ Modals: full bottom sheet ─ */
+  .mo{padding:0;align-items:flex-end}
+  .md,.md-lg,.md-xl,.md-sm,.md-xs{width:100%!important;max-width:100%!important;border-radius:20px 20px 0 0;max-height:90vh}
+  .md-h{padding:16px 16px 0}
+  .md-t{font-size:18px}
+  .md-b{padding:14px 16px}
+  .md-f{padding:10px 16px 28px;gap:8px}
+  .md-f .btn{flex:1;justify-content:center}
+
+  /* ─ Forms collapse ─ */
+  .fg2,.fg3,.fg4{grid-template-columns:1fr!important}
+
+  /* ─ Sale items table scroll ─ */
+  .items-tbl{min-width:520px}
+
+  /* ─ Buttons ─ */
+  .btn{padding:9px 14px;font-size:13px}
+  .btn-xs{padding:5px 10px;font-size:12px}
+
+  /* ─ Toast ─ */
+  .toast{left:10px;right:10px;max-width:none;bottom:14px}
+
+  /* ─ Fixed bottom bar for quick actions ─ */
+  .mob-fab{display:flex}
+}
+
+/* ─ Quick-action FAB ─ */
+.mob-fab{display:none;position:fixed;bottom:20px;right:16px;z-index:400;gap:10px;flex-direction:column;align-items:flex-end}
+.fab-btn{width:52px;height:52px;border-radius:50%;border:none;font-size:22px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.fab-btn:active{transform:scale(.94)}
+.fab-main{background:var(--ink);color:#fff;width:56px;height:56px;font-size:24px}
+
+@media(max-width:400px){
+  .main{padding:55px 8px 80px}
+  .m-prod-prices{grid-template-columns:1fr 1fr 1fr}
+  .sv{font-size:18px}
+}
+
+/* Hamburger button — hidden on desktop */
+#menuToggle{display:none;position:fixed;top:12px;left:12px;z-index:600;background:var(--ink);color:var(--card);border:none;border-radius:10px;width:42px;height:42px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;box-shadow:var(--sh3)}
+
+/* Overlay behind open sidebar on mobile */
+#sbOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:490;backdrop-filter:blur(2px)}
+
+@media(max-width:768px){
+  /* Show hamburger */
+  #menuToggle{display:flex}
+
+  /* Sidebar slides in from left */
+  .sidebar{
+    position:fixed;left:-240px;top:0;bottom:0;z-index:500;
+    width:230px;transition:left .25s cubic-bezier(.4,0,.2,1);
+    overflow-y:auto;
+  }
+  .sidebar.open{left:0}
+  #sbOverlay.open{display:block}
+
+  /* Main fills full width */
+  .main{margin-left:0;padding:64px 14px 24px}
+
+  /* Page header stacks */
+  .ph{flex-direction:column;align-items:flex-start;gap:12px;margin-bottom:16px}
+  .ph-r{width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .pt{font-size:22px}
+
+  /* Stats grid: 2 columns on mobile */
+  .sr{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .sv{font-size:22px}
+
+  /* Form grids collapse */
+  .fg2,.fg3,.fg4{grid-template-columns:1fr!important}
+  .fg3 .fgrp[style*="grid-column"]{grid-column:1!important}
+
+  /* Tables: already have overflow-x:auto via .tw */
+  td,th{padding:9px 10px;font-size:13px}
+
+  /* Modals full screen */
+  .mo{padding:0;align-items:flex-end}
+  .md,.md-lg,.md-xl,.md-sm,.md-xs{
+    width:100%!important;max-width:100%!important;
+    border-radius:20px 20px 0 0;
+    max-height:92vh;
+  }
+  .md-h{padding:18px 18px 0}
+  .md-b{padding:16px 18px}
+  .md-f{padding:0 18px 24px;padding-top:12px}
+
+  /* Buttons — slightly larger tap targets */
+  .btn{padding:10px 14px;font-size:13px}
+  .btn-sm{padding:8px 12px}
+
+  /* Items table in sale modal: allow horizontal scroll */
+  .items-tbl{min-width:580px}
+
+  /* PIN screen padding */
+  #scrPin>div{width:92vw;padding:28px 20px}
+  .pkey{padding:16px 10px;font-size:18px}
+
+  /* Toast full width at bottom */
+  .toast{left:12px;right:12px;max-width:none;bottom:16px}
+
+  /* Price list filter wrap */
+  #page-pricelist .card-b>div{flex-direction:column}
+
+  /* Barcode cell smaller on mobile */
+  .bc-img svg{max-width:120px}
+
+  /* Search bar full width */
+  #pSrch{font-size:14px}
+}
+
+@media(max-width:400px){
+  .sr{grid-template-columns:1fr}
+  .main{padding:60px 10px 20px}
+  .pt{font-size:20px}
+}
+
+
+/* ══════════════════════════════════════════
+   MOBILE — Simple & Safe
+══════════════════════════════════════════ */
+#menuToggle{display:none;position:fixed;top:11px;left:11px;z-index:600;background:var(--ink);color:#fff;border:none;border-radius:9px;width:40px;height:40px;font-size:19px;cursor:pointer;align-items:center;justify-content:center;box-shadow:var(--sh3)}
+#sbOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:490}
+
+@media(max-width:768px){
+  #menuToggle{display:flex}
+  .sidebar{position:fixed;left:-235px;top:0;bottom:0;z-index:500;width:225px;transition:left .22s ease;overflow-y:auto}
+  .sidebar.open{left:0}
+  #sbOverlay.open{display:block}
+
+  .main{margin-left:0;padding:58px 10px 24px}
+
+  /* Compact page header */
+  .ph{flex-direction:column;gap:10px;margin-bottom:14px}
+  .pt{font-size:20px}.pt-sub{font-size:12px}
+  .ph-r{display:flex;gap:6px;flex-wrap:wrap}
+  .ph-r .btn{font-size:12px;padding:7px 11px}
+
+  /* Stats 2-col */
+  .sr{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .sc{padding:11px 13px}.sv{font-size:20px}.sl{font-size:9px}
+
+  /* Search filters stack */
+  .card.mb4 .card-b div[style*="grid-template-columns"]{display:flex!important;flex-direction:column!important;gap:8px!important}
+
+  /* Tables scroll horizontally */
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{min-width:540px}
+  td,th{padding:8px 10px;font-size:12.5px;white-space:nowrap}
+
+  /* Forms: single column */
+  .fg2,.fg3,.fg4{grid-template-columns:1fr!important}
+
+  /* Modals: full-width bottom sheet */
+  .mo{padding:0;align-items:flex-end}
+  .md,.md-lg,.md-xl,.md-sm,.md-xs{width:100%!important;max-width:100%!important;border-radius:18px 18px 0 0;max-height:88vh}
+  .md-h{padding:14px 14px 0}
+  .md-t{font-size:17px}
+  .md-b{padding:12px 14px}
+  .md-f{padding:10px 14px 28px;gap:8px}
+  .md-f .btn{flex:1;justify-content:center}
+
+  /* Buttons */
+  .btn{padding:8px 13px;font-size:13px}
+  .btn-xs{padding:5px 9px;font-size:11.5px}
+
+  /* Toast */
+  .toast{left:10px;right:10px;max-width:none;bottom:12px}
+
+  /* PIN screen */
+  #scrPin>div{width:90vw;padding:26px 18px}
+  .pkey{padding:14px 8px}
+}
+
+@media(max-width:380px){
+  .main{padding:55px 8px 20px}
+  .sr{grid-template-columns:1fr}
+  table{min-width:460px}
+}
+
 </style>
 </head>
 <body>
@@ -438,6 +695,8 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
   </div>
 </div>
 
+<button id="menuToggle" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+<div id="sbOverlay" onclick="closeSidebar()"></div>
 <!-- ████ MAIN APP ████ -->
 <div id="scrApp" style="display:none">
   <div class="sidebar">
@@ -489,7 +748,8 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
       <div class="card"><div class="card-b0"><div class="tw">
         <table><thead><tr><th style="min-width:165px" data-i18n="th.barcode">Barcode</th><th data-i18n="th.productname">Product Name</th><th data-i18n="th.brand">Brand</th><th data-i18n="th.category">Category</th><th data-i18n="th.unit">Unit</th><th style="min-width:90px" data-i18n="th.purchaserate">Purchase Rate ₹</th><th style="min-width:90px" data-i18n="th.retailrate">Retail Rate ₹</th><th style="min-width:90px" data-i18n="th.wholesalerate">Wholesale Rate ₹</th><th data-i18n="th.actions">Actions</th></tr></thead>
         <tbody id="prodTb"></tbody></table>
-      </div></div></div>
+      </div></div>
+      </div>
     </div>
 
     <!-- SALES -->
@@ -501,7 +761,8 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
       <div class="card"><div class="card-b0"><div class="tw">
         <table><thead><tr><th data-i18n="th.invoice">Invoice #</th><th data-i18n="th.date">Date</th><th data-i18n="th.customer">Customer</th><th data-i18n="th.items">Items</th><th data-i18n="th.discount">Discount</th><th data-i18n="th.total">Total</th><th data-i18n="th.status">Status</th><th data-i18n="th.actions">Actions</th></tr></thead>
         <tbody id="saleTb"></tbody></table>
-      </div></div></div>
+      </div></div>
+      </div>
     </div>
 
     <!-- PRICE LIST -->
@@ -548,7 +809,8 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
       <div class="card"><div class="card-b0"><div class="tw">
         <table><thead><tr><th data-i18n="th.catname">Category Name</th><th data-i18n="th.products">Products</th><th data-i18n="th.actions">Actions</th></tr></thead>
         <tbody id="catTb"></tbody></table>
-      </div></div></div>
+      </div></div>
+      </div>
     </div>
 
     <!-- BRANDS -->
@@ -557,7 +819,8 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
       <div class="card"><div class="card-b0"><div class="tw">
         <table><thead><tr><th data-i18n="th.brandname">Brand Name</th><th data-i18n="th.products">Products</th><th data-i18n="th.actions">Actions</th></tr></thead>
         <tbody id="brandTb"></tbody></table>
-      </div></div></div>
+      </div></div>
+      </div>
     </div>
 
     <!-- UNITS -->
@@ -566,7 +829,8 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
       <div class="card"><div class="card-b0"><div class="tw">
         <table><thead><tr><th data-i18n="th.unitname">Unit Name</th><th data-i18n="th.abbr">Abbreviation</th><th data-i18n="th.products">Products</th><th data-i18n="th.actions">Actions</th></tr></thead>
         <tbody id="uomTb"></tbody></table>
-      </div></div></div>
+      </div></div>
+      </div>
     </div>
 
     <!-- ADMIN PANEL -->
@@ -909,7 +1173,6 @@ window.QRsv=function(text,cs){
   return'<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+W+'" viewBox="0 0 '+W+' '+W+'"><rect width="'+W+'" height="'+W+'" fill="#fff"/><g fill="#000">'+rects+'</g></svg>';
 };
 })();
-</script>
 </script>
 <script>
 'use strict';
@@ -1341,7 +1604,6 @@ function rSales(){
     </tr>`;
   }).join('')||'<tr><td colspan="8"><div class="empty"><div class="empty-i">💰</div><p>No sales yet</p></div></td></tr>';
 }
-
 function openSaleModal(){
   _sI=[];
   document.getElementById('sCust').value='Guest';
@@ -1592,7 +1854,10 @@ function delUOM(id){
 // ════════════════════════════════════════════
 //   CATEGORIES
 // ════════════════════════════════════════════
-function rCat(){const prods=gP();document.getElementById('catTb').innerHTML=gC().map(c=>`<tr><td style="font-weight:600">${esc(c.name)}</td><td><span class="badge b-bl">${prods.filter(p=>p.cat===c.name).length} products</span></td><td><div style="display:flex;gap:6px"><button class="btn btn-ou btn-sm" onclick="openCatModal('${c.id}')">Edit</button><button class="btn btn-rd btn-sm" onclick="delCat('${c.id}')">✕</button></div></td></tr>`).join('')||'<tr><td colspan="3"><div class="empty"><div class="empty-i">📂</div><p>No categories yet</p></div></td></tr>'}
+function rCat(){
+  const prods=gP();
+  document.getElementById('catTb').innerHTML=gC().map(c=>`<tr><td style="font-weight:600">${esc(c.name)}</td><td><span class="badge b-bl">${prods.filter(p=>p.cat===c.name).length} products</span></td><td><div style="display:flex;gap:6px"><button class="btn btn-ou btn-sm" onclick="openCatModal('${c.id}')">Edit</button><button class="btn btn-rd btn-sm" onclick="delCat('${c.id}')">✕</button></div></td></tr>`).join('')||'<tr><td colspan="3"><div class="empty"><div class="empty-i">📂</div><p>No categories yet</p></div></td></tr>';
+}
 function openCatModal(id=''){document.getElementById('eCatId').value=id;document.getElementById('mCatT').textContent=id?'Edit Category':'Add Category';const c=id?gC().find(x=>x.id===id):null;document.getElementById('catN').value=c?.name||'';openM('mCat')}
 function saveCat(){if(!vReq('catN','Category name is required'))return;const name=document.getElementById('catN').value.trim();const cats=gC();const eid=document.getElementById('eCatId').value;if(!eid&&cats.find(c=>c.name.toLowerCase()===name.toLowerCase())){showErr('catN','Already exists');return}if(eid){const i=cats.findIndex(x=>x.id===eid);if(i>-1)cats[i].name=name}else cats.push({id:uid(),name});sC(cats);closeM('mCat');rCat();toast('Category saved!')}
 function delCat(id){const prods=gP(),cat=gC().find(c=>c.id===id);if(cat&&prods.find(p=>p.cat===cat.name)){toast(`Cannot delete — ${prods.filter(p=>p.cat===cat.name).length} products use this category`,'error');return}if(!confirm('Delete?'))return;sC(gC().filter(c=>c.id!==id));rCat();toast('Deleted','info')}
@@ -2771,6 +3036,103 @@ function importData(input){
 }
 
 
+
+
+
+// ════════════════════════════════════════════
+//   MOBILE CARD RENDERS
+// ════════════════════════════════════════════
+
+function renderMobProds(list) {
+  const el = document.getElementById('prodCards');
+  if (!el) return;
+  if (!list.length) { el.innerHTML = '<div class="empty"><div class="empty-i">📦</div><p>No products found</p></div>'; return; }
+  el.innerHTML = list.map(p => `
+    <div class="m-prod-card">
+      <div class="m-prod-top">
+        <div style="flex:1;min-width:0">
+          <div class="m-prod-name">${esc(p.name)}</div>
+          <div class="m-prod-brand">${esc(p.co||'')}${p.co&&p.cat?' · ':''}${p.cat?'<span class="badge b-bl" style="font-size:10px;padding:1px 7px">'+esc(p.cat)+'</span>':''}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn btn-ou btn-xs" onclick="openProdModal('${p.id}')">✏️</button>
+          <button class="btn btn-rd btn-xs" onclick="delProd('${p.id}')">✕</button>
+        </div>
+      </div>
+      <div class="m-prod-prices">
+        <div><div class="m-price-lbl">Cost</div><div class="m-price-val pp">₹${parseFloat(p.pp||0).toFixed(0)}</div></div>
+        <div><div class="m-price-lbl">Retail</div><div class="m-price-val rp">₹${parseFloat(p.rp||0).toFixed(0)}</div></div>
+        <div><div class="m-price-lbl">Wholesale</div><div class="m-price-val wp">₹${parseFloat(p.wp||0).toFixed(0)}</div></div>
+      </div>
+      <div class="m-prod-actions">
+        <span class="m-bc">${esc(p.bc||'')}</span>
+        <button class="btn btn-ou btn-xs" onclick="openBCPr('${p.id}')">🖨 Label</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderMobSales(sales) {
+  const el = document.getElementById('saleCards');
+  if (!el) return;
+  const list = [...sales].reverse();
+  if (!list.length) { el.innerHTML = '<div class="empty"><div class="empty-i">💰</div><p>No sales yet</p></div>'; return; }
+  el.innerHTML = list.map((s, i) => {
+    const num = String(sales.length - i).padStart(4, '0');
+    return `<div class="m-sale-card">
+      <div class="m-sale-top">
+        <div>
+          <div class="m-sale-inv">#${num} · ${fD(s.date)}</div>
+          <div class="m-sale-cust">${esc(s.cust||'Guest')}</div>
+          <div class="m-sale-meta">
+            <span class="badge ${s.status==='paid'?'b-gn':'b-rd'}">${s.status||'unpaid'}</span>
+            <span style="font-size:11.5px;color:var(--ink3)">${s.items?.length||0} item${s.items?.length!==1?'s':''}</span>
+            ${(s.disc||0)>0?`<span style="font-size:11.5px;color:var(--rd)">−${fM(s.disc)} off</span>`:''}
+          </div>
+        </div>
+        <div class="m-sale-total">${fM(s.grand)}</div>
+      </div>
+      <div class="m-sale-actions">
+        <button class="btn btn-ou btn-sm" style="flex:1" onclick='printRcp(${JSON.stringify(s).replace(/'/g,"&#39;")})'>🖨 Receipt</button>
+        <button class="btn btn-rd btn-sm" onclick="delSale('${s.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderMobMaster(cards_id, items, countFn, editFn, delFn, icon) {
+  const el = document.getElementById(cards_id);
+  if (!el) return;
+  if (!items.length) { el.innerHTML = `<div class="empty"><div class="empty-i">${icon}</div><p>None added yet</p></div>`; return; }
+  el.innerHTML = items.map(item => `
+    <div class="m-master-card">
+      <div>
+        <div class="m-master-name">${esc(item.name)}${item.abbr?' <span style="font-size:11px;color:var(--ink3)">('+esc(item.abbr)+')</span>':''}</div>
+        <div class="m-master-count">${countFn(item)} products</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ou btn-xs" onclick="${editFn}('${item.id}')">✏️</button>
+        <button class="btn btn-rd btn-xs" onclick="${delFn}('${item.id}')">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════
+//   MOBILE SIDEBAR TOGGLE
+// ════════════════════════════════════════════
+function toggleSidebar(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sbOverlay').classList.toggle('open');
+}
+function closeSidebar(){
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sbOverlay').classList.remove('open');
+}
+// Close sidebar when a nav item is tapped on mobile
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.querySelectorAll('.ni').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ if(window.innerWidth<=768) closeSidebar(); });
+  });
+});
 
 // ════════════════════════════════════════════
 //   PIN LOCK
