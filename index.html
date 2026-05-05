@@ -1,0 +1,2973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Karmavati Tools &amp; Ele — ERP</title>
+<!-- Fonts load from system (no external dependency) -->
+<script>
+// Minimal Code128 barcode generator (no external dependency)
+(function(){
+  const C128={
+    vals:{' ':0,'!':1,'"':2,'#':3,'$':4,'%':5,'&':6,"'":7,'(':8,')':9,'*':10,'+':11,',':12,'-':13,'.':14,'/':15,'0':16,'1':17,'2':18,'3':19,'4':20,'5':21,'6':22,'7':23,'8':24,'9':25,':':26,';':27,'<':28,'=':29,'>':30,'?':31,'@':32,'A':33,'B':34,'C':35,'D':36,'E':37,'F':38,'G':39,'H':40,'I':41,'J':42,'K':43,'L':44,'M':45,'N':46,'O':47,'P':48,'Q':49,'R':50,'S':51,'T':52,'U':53,'V':54,'W':55,'X':56,'Y':57,'Z':58,'[':59,'\\':60,']':61,'^':62,'_':63,'`':64,'a':65,'b':66,'c':67,'d':68,'e':69,'f':70,'g':71,'h':72,'i':73,'j':74,'k':75,'l':76,'m':77,'n':78,'o':79,'p':80,'q':81,'r':82,'s':83,'t':84,'u':85,'v':86,'w':87,'x':88,'y':89,'z':90,'{':91,'|':92,'}':93,'~':94},
+    patterns:['11011001100','11001101100','11001100110','10010011000','10010001100','10001001100','10011001000','10011000100','10001100100','11001001000','11001000100','11000100100','10110011100','10011011100','10011001110','10111001100','10011101100','10011100110','11001110010','11001011100','11001001110','11011100100','11001110100','11101101110','11101001100','11100101100','11100100110','11101100100','11100110100','11100110010','11011011000','11011000110','11000110110','10100011000','10001011000','10001000110','10110001000','10001101000','10001100010','11010001000','11000101000','11000100010','10110111000','10110001110','10001101110','10111011000','10111000110','10001110110','11101110110','11010001110','11000101110','11011101000','11011100010','11011101110','11101011000','11101000110','11100010110','11101101000','11101100010','11100011010','11101111010','11001000010','11110001010','10100110000','10100001100','10010110000','10010000110','10000101100','10000100110','10110010000','10110000100','10011010000','10011000010','10000110100','10000110010','11000010010','11001010000','11110111010','11000010100','10001111010','10100111100','10010111100','10010011110','10111100100','10011110100','10011110010','11110100100','11110010100','11110010010','11011011110','11011110110','11110110110','10101111000','10100011110','10001011110','10111101000','10111100010','11110101000','11110100010','10111011110','10111101110','11101011110','11110101110','11010000100','11010010000','11010011100','11000111010'],
+    start:103, stop:106
+  };
+  function encode(text){
+    let vals=[C128.start];
+    let chk=C128.start;
+    for(let i=0;i<text.length;i++){
+      const c=text[i];
+      const v=C128.vals[c];
+      if(v===undefined)continue;
+      vals.push(v);
+      chk+=v*(i+1);
+    }
+    vals.push(chk%103);
+    vals.push(C128.stop);
+    return vals.map(v=>C128.patterns[v]).join('');
+  }
+  window.JsBarcode=function(el, text, opts){
+    opts=opts||{};
+    const w=opts.width||2, h=opts.height||60, margin=opts.margin||10;
+    const showVal=opts.displayValue!==false;
+    const fg=opts.lineColor||'#000', bg=opts.background||'#fff';
+    const fontSize=opts.fontSize||12;
+    try{
+      const bits=encode(String(text));
+      const bw=bits.length*w+margin*2;
+      const bh=h+(showVal?fontSize+4:0)+margin*2;
+      let rects='';
+      for(let i=0;i<bits.length;i++){
+        if(bits[i]==='1') rects+=`<rect x="${margin+i*w}" y="${margin}" width="${w}" height="${h}" fill="${fg}"/>`;
+      }
+      const textEl=showVal?`<text x="${bw/2}" y="${margin+h+fontSize+2}" text-anchor="middle" font-family="monospace" font-size="${fontSize}" fill="${fg}">${text}</text>`:'';
+      const svgContent=`<rect width="${bw}" height="${bh}" fill="${bg}"/>${rects}${textEl}`;
+      if(typeof el==='string'){
+        const target=document.querySelector(el);
+        if(target){target.setAttribute('viewBox',`0 0 ${bw} ${bh}`);target.setAttribute('width',bw);target.setAttribute('height',bh);target.innerHTML=svgContent}
+      } else if(el&&el.tagName==='svg'){
+        el.setAttribute('viewBox',`0 0 ${bw} ${bh}`);el.setAttribute('width',bw);el.setAttribute('height',bh);el.innerHTML=svgContent;
+      }
+    } catch(e){}
+  };
+})();
+</script>
+<style>
+:root{
+  --bg:#EDE8DF;--surf:#F7F4EF;--card:#FFF;--bord:#D9D1C4;--bord2:#EAE3D8;
+  --ink:#1A1410;--ink2:#5C5048;--ink3:#9D8E82;--ink4:#C4B9AF;
+  --gold:#B07B2A;--goldl:#C48E3A;--goldd:rgba(176,123,42,.12);--goldb:rgba(176,123,42,.22);
+  --gn:#2A6B45;--gnd:rgba(42,107,69,.1);--gnb:rgba(42,107,69,.2);
+  --rd:#A63228;--rdd:rgba(166,50,40,.09);--rdb:rgba(166,50,40,.18);
+  --bl:#2A4E8A;--bld:rgba(42,78,138,.09);--blb:rgba(42,78,138,.18);
+  --pu:#6B3FA0;--pud:rgba(107,63,160,.1);--pub:rgba(107,63,160,.2);
+  --sb:#1A1410;--sbt:#C4B9AF;--sb2:#756860;--sba:#B07B2A;
+  --r:8px;--r2:12px;
+  --sh:0 1px 3px rgba(26,20,16,.08),0 1px 12px rgba(26,20,16,.04);
+  --sh2:0 4px 20px rgba(26,20,16,.1),0 1px 4px rgba(26,20,16,.06);
+  --sh3:0 12px 48px rgba(26,20,16,.18),0 2px 8px rgba(26,20,16,.08);
+  --fd:Georgia,'Times New Roman',serif;--fb:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--fm:'Courier New',Courier,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--fb);font-size:14px;line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased}
+button{font-family:var(--fb);cursor:pointer}
+input,select,textarea{font-family:var(--fb)}
+
+
+/* ── FILE PERSISTENCE ── */
+#fpStatus button.fp-btn{background:none;border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:6px 10px;color:rgba(255,255,255,.55);font-size:11px;cursor:pointer;width:100%;text-align:center;transition:all .15s}
+#fpStatus button.fp-btn:hover{border-color:var(--gold);color:var(--gold)}
+.fp-ok{color:var(--gn);font-size:11px;font-weight:600;display:block;padding:4px 2px}
+.fp-warn{color:rgba(255,255,255,.4);font-size:10.5px;display:block;padding:2px}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:225px;background:var(--sb);display:flex;flex-direction:column;z-index:100}
+.sb-brand{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-erp{font-family:var(--fd);font-size:20px;font-weight:700;color:var(--card)}
+.sb-erp em{color:var(--gold);font-style:normal}
+.sb-co{font-size:11px;color:var(--sb2);text-transform:uppercase;letter-spacing:1px;margin-top:3px;font-weight:600}
+.sb-nav{flex:1;padding:14px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.sb-nav::-webkit-scrollbar{display:none}
+.ni{display:flex;align-items:center;gap:11px;padding:10px 14px;border-radius:var(--r);color:var(--sbt);font-size:13.5px;font-weight:500;border:none;background:none;width:100%;text-align:left;cursor:pointer;transition:all .15s}
+.ni:hover{background:rgba(255,255,255,.06);color:var(--card)}
+.ni.on{background:var(--goldd);color:var(--sba);border-left:3px solid var(--sba);padding-left:11px}
+.ni .ic{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.ni-lbl{font-size:10px;color:var(--sb2);text-transform:uppercase;letter-spacing:1.5px;padding:12px 14px 4px;font-weight:600}
+.sb-foot{padding:14px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px}
+.sb-av{width:34px;height:34px;border-radius:50%;background:var(--goldd);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold);font-size:13px;flex-shrink:0}
+.sb-un{font-size:13px;font-weight:600;color:var(--card)}
+.sb-ur{font-size:10px;color:var(--sb2);text-transform:uppercase;letter-spacing:.8px}
+
+/* ── MAIN ── */
+.main{margin-left:225px;padding:26px 30px;min-height:100vh}
+.page{display:none}.page.on{display:block}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:16px}
+.pt{font-family:var(--fd);font-size:28px;font-weight:700;color:var(--ink);line-height:1.1}
+.pt-sub{font-size:13px;color:var(--ink3);margin-top:3px}
+.ph-r{display:flex;gap:8px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--r);font-size:13.5px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all .15s;white-space:nowrap}
+.btn-dk{background:var(--ink);color:var(--card);border-color:var(--ink)}.btn-dk:hover{background:#2E2520}
+.btn-go{background:var(--gold);color:var(--card);border-color:var(--gold)}.btn-go:hover{background:var(--goldl)}
+.btn-ou{background:var(--card);color:var(--ink);border-color:var(--bord)}.btn-ou:hover{border-color:var(--ink)}
+.btn-rd{background:var(--rdd);color:var(--rd);border-color:var(--rdb)}.btn-rd:hover{background:var(--rdb)}
+.btn-gn{background:var(--gnd);color:var(--gn);border-color:var(--gnb)}
+.btn-pu{background:var(--pud);color:var(--pu);border-color:var(--pub)}
+.btn-sm{padding:6px 13px;font-size:12.5px}
+.btn-xs{padding:3px 9px;font-size:11.5px}
+.btn-wf{width:100%;justify-content:center}
+.btn-icon{width:32px;height:32px;padding:0;justify-content:center;border-radius:var(--r)}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--bord);border-radius:var(--r2);box-shadow:var(--sh)}
+.card-h{padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.card-t{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--ink2)}
+.card-b{padding:16px 20px}
+.card-b0{padding:0 0 6px}
+.mb4{margin-bottom:16px}.mb3{margin-bottom:12px}.mb2{margin-bottom:8px}
+.mt4{margin-top:16px}.mt3{margin-top:12px}.mt2{margin-top:8px}
+
+/* ── STATS ── */
+.sr{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.sc{background:var(--card);border:1px solid var(--bord);border-radius:var(--r2);padding:18px 20px;box-shadow:var(--sh)}
+.sl{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--ink3);margin-bottom:6px}
+.sv{font-family:var(--fd);font-size:28px;font-weight:700}
+.sc-ch{font-size:11.5px;color:var(--ink3);margin-top:4px}
+.c-go{color:var(--gold)}.c-gn{color:var(--gn)}.c-bl{color:var(--bl)}.c-rd{color:var(--rd)}
+
+/* ── TABLE ── */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{color:var(--ink3);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:10px 14px;text-align:left;border-bottom:1.5px solid var(--bord);background:var(--surf);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--bord2);font-size:13.5px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background .1s}
+tbody tr:hover td{background:#FDFAF6}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.b-gn{background:var(--gnd);color:var(--gn);border:1px solid var(--gnb)}
+.b-rd{background:var(--rdd);color:var(--rd);border:1px solid var(--rdb)}
+.b-bl{background:var(--bld);color:var(--bl);border:1px solid var(--blb)}
+.b-go{background:var(--goldd);color:var(--gold);border:1px solid var(--goldb)}
+.b-pu{background:var(--pud);color:var(--pu);border:1px solid var(--pub)}
+.b-nt{background:var(--surf);color:var(--ink2);border:1px solid var(--bord)}
+
+/* ── FORM ── */
+.fg{display:grid;gap:13px}
+.fg2{grid-template-columns:1fr 1fr}.fg3{grid-template-columns:1fr 1fr 1fr}.fg4{grid-template-columns:1fr 1fr 1fr 1fr}
+.fgrp{display:flex;flex-direction:column;gap:5px;position:relative}
+.flbl{font-size:11px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.7px}
+.req{color:var(--rd);margin-left:2px}
+.fc{background:var(--surf);border:1.5px solid var(--bord);border-radius:var(--r);padding:9px 13px;color:var(--ink);font-size:14px;outline:none;width:100%;transition:border-color .2s}
+.fc:focus{border-color:var(--gold);background:var(--card)}
+.fc.err{border-color:var(--rd);background:#FFF8F8}
+.fc[readonly]{background:var(--bg);color:var(--ink2);cursor:default}
+select.fc{cursor:pointer}
+select.fc option{background:var(--card)}
+.fc-sm{padding:7px 10px;font-size:13px}
+.field-err{font-size:11.5px;color:var(--rd);margin-top:3px}
+.field-err::before{content:'⚠ '}
+.fsec{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--ink);padding-bottom:9px;border-bottom:1px solid var(--bord2);margin-bottom:13px;display:flex;align-items:center;justify-content:space-between}
+.fc-hint{font-size:11.5px;color:var(--ink3);margin-top:3px}
+.fc-group{display:flex;gap:8px}
+.fc-group .fc{flex:1}
+
+/* ── MODAL ── */
+.mo{display:none;position:fixed;inset:0;background:rgba(26,20,16,.75);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:20px}
+.mo.open{display:flex}
+.md{background:var(--card);border-radius:var(--r2);width:620px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:var(--sh3);display:flex;flex-direction:column}
+.md-lg{width:860px}.md-xl{width:1100px}.md-sm{width:440px}.md-xs{width:380px}
+.md-h{padding:22px 26px 0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.md-t{font-family:var(--fd);font-size:22px;font-weight:700;color:var(--ink)}
+.md-c{background:none;border:none;color:var(--ink3);font-size:22px;padding:4px;border-radius:6px}
+.md-c:hover{background:var(--rdd);color:var(--rd)}
+.md-b{padding:22px 26px;flex:1}
+.md-f{padding:0 26px 22px;display:flex;justify-content:flex-end;gap:9px;flex-shrink:0;border-top:1px solid var(--bord2);padding-top:14px;margin-top:4px}
+
+/* ── ITEMS TABLE (Sale & Purchase) ── */
+.items-tbl{width:100%;border-collapse:collapse;min-width:700px}
+.items-tbl th{background:var(--surf);color:var(--ink3);font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;padding:8px 10px;border-bottom:1.5px solid var(--bord);text-align:left;white-space:nowrap}
+.items-tbl td{padding:5px 5px;border-bottom:1px solid var(--bord2);vertical-align:middle}
+.items-tbl tr:last-child td{border-bottom:none}
+.items-tbl .fc{padding:7px 10px;font-size:13px;border-radius:6px}
+.items-tbl td input[type=number]{-moz-appearance:textfield}
+.items-tbl td input::-webkit-outer-spin-button,.items-tbl td input::-webkit-inner-spin-button{-webkit-appearance:none}
+.it-total{font-family:var(--fm);font-size:13px;font-weight:600;color:var(--gold);padding:0 6px}
+.it-hint{font-size:10.5px;color:var(--ink3);margin-top:2px;text-align:center}
+
+/* ── TOGGLE SWITCH ── */
+.tog-sw{position:relative;display:inline-block;width:42px;height:22px;flex-shrink:0}
+.tog-sw input{opacity:0;width:0;height:0}
+.tog-sl{position:absolute;cursor:pointer;inset:0;background:var(--bord);border-radius:22px;transition:.25s}
+.tog-sl:before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+input:checked+.tog-sl{background:var(--gn)}
+input:checked+.tog-sl:before{transform:translateX(20px)}
+
+/* ── PERMISSION ROWS ── */
+.perm-table{width:100%;border-collapse:collapse}
+.perm-table th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);padding:8px 12px;border-bottom:1.5px solid var(--bord);background:var(--surf);text-align:left}
+.perm-table td{padding:11px 12px;border-bottom:1px solid var(--bord2);vertical-align:middle}
+.perm-table tr:last-child td{border-bottom:none}
+.perm-name{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:9px}
+.perm-desc{font-size:12px;color:var(--ink3);margin-top:2px}
+
+/* ── PURCHASE CARDS ── */
+.pur-card{background:var(--surf);border:1.5px solid var(--bord);border-radius:var(--r2);margin-bottom:10px;overflow:hidden}
+.pur-card-head{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--bord2);border-bottom:1px solid var(--bord)}
+.pur-card-num{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--gold);white-space:nowrap}
+.pur-card-prod{font-size:12.5px;font-weight:600;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pur-card-body{padding:12px 14px}
+.pur-row1{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.pur-row2{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px;padding-top:8px;border-top:1px dashed var(--bord)}
+.pur-row3{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding-top:8px;border-top:1px dashed var(--bord2)}
+.pur-fi{display:flex;flex-direction:column;gap:4px}
+.pur-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ink3);white-space:nowrap}
+.pur-conv{display:flex;align-items:center;gap:5px;padding:6px 10px;background:var(--bld);border:1px solid var(--blb);border-radius:6px;font-size:11.5px;color:var(--bl);font-weight:600;white-space:nowrap}
+.pur-total{font-family:var(--fd);font-size:18px;font-weight:700;color:var(--gold)}
+.pur-auto{font-size:11px;color:var(--ink3);margin-top:1px}
+.pur-uom-block{background:var(--card);border:1px solid var(--bord);border-radius:var(--r);padding:10px 12px;margin-top:8px}
+.pur-uom-item{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--bord2)}
+.pur-uom-item:last-child{border-bottom:none}
+
+/* ── SALE CUSTOM ── */
+.sale-row-custom{background:#FFFCF2}
+.sale-row-custom td{border-left:3px solid var(--gold)}
+.perm-name{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:9px}
+.perm-desc{font-size:12px;color:var(--ink3);margin-top:2px}
+
+/* ── UOM TAG ── */
+.uom-tag{display:inline-flex;align-items:center;background:var(--goldd);color:var(--gold);border:1px solid var(--goldb);border-radius:5px;padding:3px 9px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.conv-pill{display:inline-flex;align-items:center;background:var(--bld);color:var(--bl);border:1px solid var(--blb);border-radius:5px;padding:3px 9px;font-size:11.5px;font-weight:600;white-space:nowrap}
+
+/* ── BC ── */
+.bc-cell{display:flex;flex-direction:column;gap:4px}
+.bc-img{background:var(--card);border:1px solid var(--bord);border-radius:5px;padding:5px 7px;display:inline-block}
+.bc-code{font-family:var(--fm);font-size:9.5px;color:var(--ink3);letter-spacing:.5px}
+
+/* ── SCAN ── */
+.scan-box{position:relative;width:100%;border-radius:10px;overflow:hidden;background:#000;max-width:360px;margin:0 auto}
+#scanVid{width:100%;display:block;min-height:200px}
+.scan-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.scan-fr{width:220px;height:110px;border:2px solid var(--gold);border-radius:8px;box-shadow:0 0 0 2000px rgba(0,0,0,.45)}
+.scan-ln{position:absolute;width:200px;height:2px;background:var(--gold);animation:scanLine 1.8s ease-in-out infinite;box-shadow:0 0 8px var(--gold)}
+@keyframes scanLine{0%{top:calc(50% - 50px)}100%{top:calc(50% + 50px)}}
+.scan-msg{text-align:center;font-size:13px;color:var(--ink2);margin-top:12px;padding:9px 14px;background:var(--surf);border-radius:var(--r)}
+
+/* ── TOTAL BAR ── */
+.tot-bar{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);padding:14px 18px;margin-top:12px}
+.tot-row{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:var(--ink2);margin-bottom:8px}
+.tot-row:last-child{margin-bottom:0}
+.tot-grand{font-family:var(--fd);font-size:22px;font-weight:700;color:var(--ink)}
+
+/* ── MISC ── */
+.divider{height:1px;background:var(--bord2);margin:16px 0}
+.empty{text-align:center;padding:52px 20px;color:var(--ink3)}
+.empty-i{font-size:42px;margin-bottom:10px;opacity:.7}
+.mono{font-family:var(--fm);font-size:12px;color:var(--gold);letter-spacing:.5px}
+.s-lo{color:var(--rd);font-family:var(--fm);font-size:12.5px;font-weight:600}
+.s-ok{color:var(--gn);font-family:var(--fm);font-size:12.5px}
+.s-wn{color:var(--gold);font-family:var(--fm);font-size:12.5px}
+.sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-t{font-family:var(--fd);font-size:15px;font-weight:600}
+.hidden{display:none!important}
+/* ── INLINE PRICE EDIT ── */
+.price-inp{background:transparent;border:none;border-bottom:1.5px solid transparent;width:82px;font-family:var(--fm);font-size:13px;text-align:right;padding:2px 4px;border-radius:3px;transition:all .15s;cursor:default;display:block}
+.price-inp:hover{border-bottom-color:var(--bord);background:var(--surf);cursor:text}
+.price-inp:focus{border-bottom-color:var(--gold);background:var(--card);outline:none;cursor:text}
+.price-inp.pp{color:var(--ink)}.price-inp.rp{color:var(--gn);font-weight:600}.price-inp.wp{color:var(--gold);font-weight:600}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--bord);border-radius:3px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--ink);color:var(--card);border-radius:10px;padding:12px 18px;font-size:13.5px;font-weight:500;display:flex;align-items:center;gap:9px;z-index:9999;max-width:380px;transform:translateY(90px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);box-shadow:var(--sh3)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:var(--gn)}.toast.error{background:var(--rd)}.toast.info{background:var(--bl)}
+
+/* ── PRINT ── */
+@media print{
+  *{box-sizing:border-box}
+  html,body{
+    margin:0!important;padding:0!important;
+    background:#fff!important;color:#000!important;
+    height:auto!important;min-height:0!important;
+    display:block!important;
+  }
+  .sidebar,.mo,.toast,.no-print,
+  .main,nav,header,footer{display:none!important}
+  #printArea{
+    display:block!important;
+    position:absolute!important;
+    top:0!important;left:0!important;
+    width:100%!important;
+    margin:0!important;padding:0!important;
+  }
+}
+#printArea{display:none;position:fixed;top:0;left:0;width:100%}
+/* Default: A4 portrait */
+@media print{@page{size:A4 portrait;margin:10mm}}
+/* A5/custom overridden by JS before each print */
+
+/* ── RECEIPT (A5) ── */
+.rcp-wrap{width:148mm;margin:0 auto;padding:10mm 8mm;font-family:'Courier New',monospace;color:#000;position:relative;box-sizing:border-box}
+.rcp-hd{text-align:center;padding-bottom:8px;border-bottom:2px dashed #333;margin-bottom:10px}
+.rcp-shop{font-size:20px;font-weight:700;letter-spacing:1px}
+.rcp-addr{font-size:11px;color:#555;margin-top:3px}
+.rcp-m{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+.rcp-tbl{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0}
+.rcp-tbl th{text-align:left;border-bottom:1px solid #999;padding:3px 2px;font-size:10px}
+.rcp-tbl td{padding:4px 2px;border-bottom:1px dotted #ddd}
+.rcp-tbl .tr{text-align:right}
+.rcp-tot{border-top:2px dashed #333;margin-top:8px;padding-top:8px}
+.rcp-tot-r{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.rcp-grd{font-size:16px;font-weight:700;border-top:1px solid #333;padding-top:6px;margin-top:6px}
+.rcp-ft{text-align:center;margin-top:10px;font-size:10px;color:#666;border-top:1px dashed #ccc;padding-top:8px}
+.stamp{position:absolute;font-size:28px;font-weight:900;border:3px solid;border-radius:6px;padding:4px 10px;opacity:.4;transform:translateX(-50%) rotate(-28deg);pointer-events:none;white-space:nowrap;top:44%;left:50%}
+.stamp-paid{color:#1a7a3a;border-color:#1a7a3a}.stamp-unpaid{color:#c0392b;border-color:#c0392b}
+/* ── PURCHASE ORDER (A4) ── */
+.po{max-width:190mm;margin:0 auto;padding:0;font-family:Arial,sans-serif;font-size:12px;color:#000}
+.po-hd{display:flex;justify-content:space-between;border-bottom:2px solid #1a1410;padding-bottom:14px;margin-bottom:14px}
+.po-title{font-size:24px;font-weight:700;font-family:Georgia,serif}
+.po-tbl{width:100%;border-collapse:collapse;font-size:10.5px;margin:12px 0}
+.po-tbl th{background:#1a1410;color:#fff;padding:6px 7px;text-align:left}
+.po-tbl td{padding:5px 7px;border-bottom:1px solid #e0e0e0}
+.po-tbl tr:nth-child(even) td{background:#f7f4f0}
+.po-tot{text-align:right;margin-top:10px}
+.po-tr{display:flex;justify-content:flex-end;gap:24px;font-size:12.5px;margin-bottom:4px}
+.po-grd{font-size:17px;font-weight:700;border-top:2px solid #1a1410;padding-top:8px;margin-top:8px}
+/* ── PRICE LIST (A4) ── */
+.pl-pr{max-width:190mm;margin:0 auto;padding:0;font-family:Arial,sans-serif}
+.pl-pr h1{font-size:20px;font-family:Georgia,serif;text-align:center}
+.pl-pr .pl-dt{text-align:center;font-size:11px;color:#666;margin-bottom:14px}
+.pl-pr table{width:100%;border-collapse:collapse;font-size:10.5px}
+.pl-pr th{background:#1a1410;color:#fff;padding:6px 8px;text-align:left}
+.pl-pr td{padding:5px 8px;border-bottom:1px solid #e0d5c8}
+.pl-pr tr:nth-child(even) td{background:#f7f3ee}
+/* ── BARCODE LABELS — Zebra printer ── */
+.z-sheet{margin:0;padding:0;background:#fff}
+.z-grid{display:flex;flex-wrap:wrap;gap:0}
+.zlabel{
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;page-break-inside:avoid;break-inside:avoid;
+  background:#fff;overflow:hidden;
+  border:0.3pt solid #ccc;
+  box-sizing:border-box;
+  padding:1.5mm 2mm;
+}
+.zl-bc{display:flex;justify-content:center;align-items:center;width:100%}
+.zl-name{font-size:7.5pt;font-weight:700;color:#000;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;margin-top:1mm}
+.zl-co{font-size:6.5pt;color:#444;line-height:1.2}
+.zl-price{font-size:9pt;font-weight:900;color:#000;line-height:1.2;margin-top:0.5mm}
+.zl-price2{font-size:7pt;color:#555;line-height:1.2}
+.rcp-hd{text-align:center;padding-bottom:12px;border-bottom:2px dashed #333;margin-bottom:12px}
+.rcp-shop{font-size:19px;font-weight:700;letter-spacing:1px}
+
+/* ── PIN LOCK ── */
+.pdot{width:18px;height:18px;border-radius:50%;border:2px solid var(--ink3);background:transparent;transition:background .2s,border-color .2s,transform .1s}
+.pdot.filled{background:var(--ink);border-color:var(--ink);transform:scale(1.15)}
+.pdot.shake{animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pkey{background:var(--bg);border:1px solid var(--bdr);border-radius:10px;font-size:20px;font-weight:600;color:var(--ink1);padding:14px;cursor:pointer;transition:background .1s}
+.pkey:hover{background:var(--hover)}
+.pkey:active{background:var(--bdr)}
+.pkey-clr{color:var(--rd)}
+.pkey-go{background:var(--dk);color:#fff;border-color:var(--dk)}
+.pkey-go:hover{background:var(--dk2,var(--dk));filter:brightness(1.1)}
+</style>
+</head>
+<body>
+
+
+
+<!-- ████ PIN LOCK ████ -->
+<div id="scrPin" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg)">
+  <div style="background:var(--card);border-radius:18px;padding:40px 36px;box-shadow:0 8px 40px rgba(0,0,0,.12);width:320px;text-align:center">
+    <div style="font-size:28px;font-weight:700;color:var(--ink1);margin-bottom:4px">🔐 Karmavati ERP</div>
+    <div style="font-size:13px;color:var(--ink3);margin-bottom:28px">Enter PIN to continue</div>
+
+    <!-- PIN dots -->
+    <div id="pinDots" style="display:flex;justify-content:center;gap:14px;margin-bottom:24px">
+      <div class="pdot" id="pd0"></div>
+      <div class="pdot" id="pd1"></div>
+      <div class="pdot" id="pd2"></div>
+      <div class="pdot" id="pd3"></div>
+    </div>
+
+    <!-- Error msg -->
+    <div id="pinErr" style="color:#e53935;font-size:12px;min-height:16px;margin-bottom:12px"></div>
+
+    <!-- Numpad -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto">
+      <button class="pkey" onclick="pinKey('1')">1</button>
+      <button class="pkey" onclick="pinKey('2')">2</button>
+      <button class="pkey" onclick="pinKey('3')">3</button>
+      <button class="pkey" onclick="pinKey('4')">4</button>
+      <button class="pkey" onclick="pinKey('5')">5</button>
+      <button class="pkey" onclick="pinKey('6')">6</button>
+      <button class="pkey" onclick="pinKey('7')">7</button>
+      <button class="pkey" onclick="pinKey('8')">8</button>
+      <button class="pkey" onclick="pinKey('9')">9</button>
+      <button class="pkey pkey-clr" onclick="pinKey('clr')" style="grid-column:1">⌫</button>
+      <button class="pkey" onclick="pinKey('0')">0</button>
+      <button class="pkey pkey-go" onclick="pinKey('go')">✓</button>
+    </div>
+
+    <!-- Reset -->
+    <div style="margin-top:24px">
+      <button onclick="showPinReset()" style="background:none;border:none;color:var(--ink3);font-size:12px;cursor:pointer;text-decoration:underline">Reset PIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIN RESET modal -->
+<div id="scrPinReset" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:var(--card);border-radius:14px;padding:32px 28px;width:300px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+    <div style="font-size:18px;font-weight:700;color:var(--ink1);margin-bottom:8px">Reset PIN</div>
+    <div style="font-size:12px;color:var(--ink3);margin-bottom:20px">Enter current PIN, then set a new 4-digit PIN</div>
+    <input id="rOldPin" type="password" inputmode="numeric" maxlength="4" placeholder="Current PIN" class="fc" style="margin-bottom:10px;text-align:center;letter-spacing:6px;font-size:18px">
+    <input id="rNewPin" type="password" inputmode="numeric" maxlength="4" placeholder="New PIN" class="fc" style="margin-bottom:10px;text-align:center;letter-spacing:6px;font-size:18px">
+    <input id="rConPin" type="password" inputmode="numeric" maxlength="4" placeholder="Confirm New PIN" class="fc" style="margin-bottom:14px;text-align:center;letter-spacing:6px;font-size:18px">
+    <div id="rPinErr" style="color:#e53935;font-size:12px;min-height:16px;margin-bottom:12px"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ou" style="flex:1" onclick="hidePinReset()">Cancel</button>
+      <button class="btn btn-dk" style="flex:1" onclick="doResetPin()">Save PIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ MAIN APP ████ -->
+<div id="scrApp" style="display:none">
+  <div class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-erp">Karmavati<em>.</em>ERP</div>
+      <div class="sb-co" id="sbCoName">Karmavati Tools &amp; Ele</div>
+    </div>
+    <nav class="sb-nav">
+      <button class="ni on perm-products" onclick="showPage('products')"><span class="ic">📦</span><span data-i18n="nav.products">Products</span></button>
+      <button class="ni perm-sales" onclick="showPage('sales')"><span class="ic">💰</span><span data-i18n="nav.sales">Sales</span></button>
+      <button class="ni perm-pricelist" onclick="showPage('pricelist')"><span class="ic">🏷️</span><span data-i18n="nav.pricelist">Price List</span></button>
+      <div class="ni-lbl perm-masters"><span data-i18n="nav.masters">Masters</span></div>
+      <button class="ni perm-categories" onclick="showPage('categories')"><span class="ic">📂</span><span data-i18n="nav.categories">Categories</span></button>
+      <button class="ni perm-brands" onclick="showPage('brands')"><span class="ic">🏷️</span><span data-i18n="nav.brands">Brands</span></button>
+      <button class="ni perm-units" onclick="showPage('units')"><span class="ic">📐</span><span data-i18n="nav.units">Units</span></button>
+      </nav>
+    <div class="sb-foot" style="flex-direction:column;align-items:stretch;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="sb-av" id="sbAv">A</div>
+        <div><div class="sb-un" id="sbUn">Admin</div><div class="sb-ur" id="sbUr">Admin</div></div>
+      </div>
+      <button id="langToggle" onclick="toggleLang()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;width:100%;transition:all .2s">🌐 मराठी</button>
+      <div id="saveStatus" style="font-size:10px;color:rgba(255,255,255,.28);text-align:center;letter-spacing:.5px"></div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- PRODUCTS -->
+    <div class="page on" id="page-products">
+      <div class="ph">
+        <div><div class="pt" data-i18n="page.products.title">Products</div><div class="pt-sub" data-i18n="page.products.sub">Manage inventory, barcodes &amp; pricing</div></div>
+        <div class="ph-r">
+          <button class="btn btn-gn" id="savePricesBtn" onclick="saveAllPrices()" style="display:none"><span data-i18n="btn.saveprices">💾 Save Price Changes</span></button>
+          <button class="btn btn-ou" onclick="downloadTemplate()"><span data-i18n="btn.template">⬇ Template</span></button>
+          <button class="btn btn-ou" onclick="openM('mCSV')"><span data-i18n="btn.importcsv">⬆ Import CSV</span></button>
+          <button class="btn btn-ou" onclick="exportProducts()"><span data-i18n="btn.export">📤 Export</span></button>
+          <button class="btn btn-ou" onclick="openScanModal()"><span data-i18n="btn.scan">📷 Scan</span></button>
+          <button class="btn btn-dk" onclick="openProdModal()"><span data-i18n="btn.addproduct">+ Add Product</span></button>
+        </div>
+      </div>
+      <div class="card mb4"><div class="card-b" style="padding:12px 16px">
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px">
+          <div style="position:relative"><span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink3)">🔍</span><input class="fc" id="pSrch" placeholder="Search name, brand, barcode…" style="padding-left:36px" oninput="renderProds()"></div>
+          <select class="fc" id="pCatF" onchange="renderProds()"><option value="">All Categories</option></select>
+          <select class="fc" id="pCmpF" onchange="renderProds()"><option value="">All Brands</option></select>
+        </div>
+      </div></div>
+      <div class="card"><div class="card-b0"><div class="tw">
+        <table><thead><tr><th style="min-width:165px" data-i18n="th.barcode">Barcode</th><th data-i18n="th.productname">Product Name</th><th data-i18n="th.brand">Brand</th><th data-i18n="th.category">Category</th><th data-i18n="th.unit">Unit</th><th style="min-width:90px" data-i18n="th.purchaserate">Purchase Rate ₹</th><th style="min-width:90px" data-i18n="th.retailrate">Retail Rate ₹</th><th style="min-width:90px" data-i18n="th.wholesalerate">Wholesale Rate ₹</th><th data-i18n="th.actions">Actions</th></tr></thead>
+        <tbody id="prodTb"></tbody></table>
+      </div></div></div>
+    </div>
+
+    <!-- SALES -->
+    <div class="page" id="page-sales">
+      <div class="ph">
+        <div><div class="pt" data-i18n="page.sales.title">Sales</div><div class="pt-sub" data-i18n="page.sales.sub">Create bills &amp; track transactions</div></div>
+        <button class="btn btn-dk" onclick="openSaleModal()"><span data-i18n="btn.newsale">+ New Sale</span></button>
+      </div>
+      <div class="card"><div class="card-b0"><div class="tw">
+        <table><thead><tr><th data-i18n="th.invoice">Invoice #</th><th data-i18n="th.date">Date</th><th data-i18n="th.customer">Customer</th><th data-i18n="th.items">Items</th><th data-i18n="th.discount">Discount</th><th data-i18n="th.total">Total</th><th data-i18n="th.status">Status</th><th data-i18n="th.actions">Actions</th></tr></thead>
+        <tbody id="saleTb"></tbody></table>
+      </div></div></div>
+    </div>
+
+    <!-- PRICE LIST -->
+    <div class="page" id="page-pricelist">
+      <div class="ph">
+        <div><div class="pt" data-i18n="page.pricelist.title">Price List</div><div class="pt-sub" data-i18n="page.pricelist.sub">Filter, sort and print pricing</div></div>
+        <div class="ph-r">
+          <button class="btn btn-gn" id="savePricesBtnPL" onclick="saveAllPrices()" style="display:none"><span data-i18n="btn.saveprices">💾 Save Price Changes</span></button>
+          <button class="btn btn-ou btn-sm" onclick="plSelAll()"><span data-i18n="btn.selectall">Select All</span></button>
+          <button class="btn btn-ou btn-sm" onclick="plClrAll()"><span data-i18n="btn.clear">Clear</span></button>
+          <button class="btn btn-dk" onclick="printPL()"><span data-i18n="btn.print">🖨 Print</span></button>
+        </div>
+      </div>
+      <div class="card mb4"><div class="card-b" style="padding:12px 16px">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <div class="fgrp" style="flex:2;min-width:140px"><label class="flbl">Search</label><input class="fc" id="plSrch" placeholder="Search…" oninput="renderPL()"></div>
+          <div class="fgrp" style="flex:1;min-width:130px"><label class="flbl">Category</label><select class="fc" id="plCatF" onchange="renderPL()"><option value="">All</option></select></div>
+          <div class="fgrp" style="flex:1;min-width:130px"><label class="flbl">Brand</label><select class="fc" id="plCoF" onchange="renderPL()"><option value="">All</option></select></div>
+          <div class="fgrp" style="flex:1;min-width:160px"><label class="flbl">Sort By</label>
+            <select class="fc" id="plSort" onchange="renderPL()">
+              <option value="name-asc">Name A→Z</option><option value="name-desc">Name Z→A</option>
+              <option value="rp-asc">Retail Low→High</option><option value="rp-desc">Retail High→Low</option>
+              <option value="wp-asc">WS Low→High</option><option value="wp-desc">WS High→Low</option>
+            </select>
+          </div>
+        </div>
+      </div></div>
+      <div class="card"><div class="card-b0"><div class="tw">
+        <table><thead><tr>
+          <th style="width:40px"><input type="checkbox" id="plCA" onchange="plTogAll(this.checked)" style="cursor:pointer;width:15px;height:15px"></th>
+          <th data-i18n="th.productname">Product</th><th data-i18n="th.brand">Brand</th><th data-i18n="th.category">Category</th><th data-i18n="th.unit">Unit</th>
+          <th style="min-width:90px" data-i18n="th.purchaserate">Purchase Rate ₹</th>
+          <th style="min-width:90px" data-i18n="th.retailrate">Retail Rate ₹</th>
+          <th style="min-width:90px" data-i18n="th.wholesalerate">Wholesale Rate ₹</th>
+        </tr></thead>
+        <tbody id="plTb"></tbody></table>
+      </div></div></div>
+    </div>
+
+
+    <!-- CATEGORIES -->
+    <div class="page" id="page-categories">
+      <div class="ph"><div><div class="pt" data-i18n="page.categories.title">Categories</div><div class="pt-sub" data-i18n="page.categories.sub">Organise products</div></div><button class="btn btn-dk" onclick="openCatModal()"><span data-i18n="btn.addcat">+ Add Category</span></button></div>
+      <div class="card"><div class="card-b0"><div class="tw">
+        <table><thead><tr><th data-i18n="th.catname">Category Name</th><th data-i18n="th.products">Products</th><th data-i18n="th.actions">Actions</th></tr></thead>
+        <tbody id="catTb"></tbody></table>
+      </div></div></div>
+    </div>
+
+    <!-- BRANDS -->
+    <div class="page" id="page-brands">
+      <div class="ph"><div><div class="pt" data-i18n="page.brands.title">Brands</div><div class="pt-sub" data-i18n="page.brands.sub">Manage product brands &amp; manufacturers</div></div><button class="btn btn-dk" onclick="openBrandModal()"><span data-i18n="btn.addbrand">+ Add Brand</span></button></div>
+      <div class="card"><div class="card-b0"><div class="tw">
+        <table><thead><tr><th data-i18n="th.brandname">Brand Name</th><th data-i18n="th.products">Products</th><th data-i18n="th.actions">Actions</th></tr></thead>
+        <tbody id="brandTb"></tbody></table>
+      </div></div></div>
+    </div>
+
+    <!-- UNITS -->
+    <div class="page" id="page-units">
+      <div class="ph"><div><div class="pt" data-i18n="page.units.title">Units of Measure</div><div class="pt-sub" data-i18n="page.units.sub">Manage product units</div></div><button class="btn btn-dk" onclick="openUOMModal()"><span data-i18n="btn.addunit">+ Add Unit</span></button></div>
+      <div class="card"><div class="card-b0"><div class="tw">
+        <table><thead><tr><th data-i18n="th.unitname">Unit Name</th><th data-i18n="th.abbr">Abbreviation</th><th data-i18n="th.products">Products</th><th data-i18n="th.actions">Actions</th></tr></thead>
+        <tbody id="uomTb"></tbody></table>
+      </div></div></div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div class="page" id="page-adminPanel">
+      <div class="ph"><div><div class="pt" data-i18n="page.admin.title">Admin Panel</div><div class="pt-sub" data-i18n="page.admin.sub">Manage users and feature access</div></div>
+      <div class="ph-r">
+        <button class="btn btn-ou" onclick="FP.exportJSON()">⬇ Backup Data</button>
+        <button class="btn btn-ou" onclick="FP.importJSON()">⬆ Restore Backup</button>
+        <button class="btn btn-dk" onclick="openUserModal()"><span data-i18n="btn.adduser">+ Add User</span></button>
+      </div></div>
+      <div class="card"><div class="card-b0"><div class="tw">
+        <table><thead><tr><th data-i18n="th.username">Username</th><th data-i18n="th.fullname">Full Name</th><th data-i18n="th.role">Role</th><th data-i18n="th.access">Accessible Features</th><th data-i18n="th.actions">Actions</th></tr></thead>
+        <tbody id="admTb"></tbody></table>
+      </div></div></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="printArea"></div>
+<div class="toast" id="toast"><span id="toastI">✓</span><span id="toastM"></span></div>
+
+<!-- ████████ MODALS ████████ -->
+
+<!-- PRODUCT -->
+<div class="mo" id="mProd">
+  <div class="md md-lg">
+    <div class="md-h"><div class="md-t" id="mProdT">Add Product</div><button class="md-c" onclick="closeM('mProd')">✕</button></div>
+    <div class="md-b"><input type="hidden" id="epId">
+      <div class="mb4"><div class="fsec">Barcode</div>
+        <div class="fgrp"><label class="flbl">Barcode Number <span style="color:var(--ink3);font-weight:400;text-transform:none;letter-spacing:0">(leave blank → auto-generated unique barcode assigned on save)</span></label>
+          <div class="fc-group"><input class="fc" id="pBC" placeholder="Scan product barcode or type manually…"><button class="btn btn-ou" onclick="openScanModal('product')" style="flex-shrink:0">📷 Scan</button></div>
+        </div>
+      </div>
+      <div class="mb4"><div class="fsec">Product Details</div>
+        <div class="fg fg3">
+          <div class="fgrp" style="grid-column:1/-1"><label class="flbl">Product Name <span class="req">*</span></label><input class="fc" id="pN" placeholder="e.g. Copper Wire 2.5mm"></div>
+          <div class="fgrp"><label class="flbl">Brand / Company <span class="req">*</span></label><select class="fc" id="pCo"><option value="">— Select Brand —</option></select></div>
+          <div class="fgrp"><label class="flbl">Category <span class="req">*</span></label><select class="fc" id="pCa"><option value="">— Select —</option></select></div>
+          <div class="fgrp"><label class="flbl">Unit <span class="req">*</span></label>
+            <select class="fc" id="pU"><option value="">— Select Unit —</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="mb4"><div class="fsec">Pricing (Rate Card)</div>
+        <div class="fg fg3">
+          <div class="fgrp"><label class="flbl">Purchase Rate ₹ (Cost Price) <span class="req">*</span></label><input class="fc" id="pPP" type="number" min="0" placeholder="e.g. 150"></div>
+          <div class="fgrp"><label class="flbl">Retail Selling Rate ₹ (MRP) <span class="req">*</span></label><input class="fc" id="pRP" type="number" min="0" placeholder="e.g. 200"></div>
+          <div class="fgrp"><label class="flbl">Wholesale Selling Rate ₹ (Trade) <span class="req">*</span></label><input class="fc" id="pWP" type="number" min="0" placeholder="e.g. 180"></div>
+        </div>
+      </div>
+    </div>
+    <div class="md-f"><button class="btn btn-ou" onclick="closeM('mProd')">Cancel</button><button class="btn btn-dk" onclick="saveProd()">Save Product</button></div>
+  </div>
+</div>
+
+<!-- SCAN -->
+<div class="mo" id="mScan">
+  <div class="md md-sm">
+    <div class="md-h"><div class="md-t">Scan Barcode</div><button class="md-c" onclick="stopScan()">✕</button></div>
+    <div class="md-b">
+      <div class="scan-box"><video id="scanVid" autoplay playsinline muted></video><div class="scan-ov"><div class="scan-fr"><div class="scan-ln"></div></div></div></div>
+      <div class="scan-msg" id="scanMsg">Initialising camera…</div>
+      <div class="divider"></div>
+      <div class="fgrp"><label class="flbl">Or Enter Manually</label>
+        <div class="fc-group"><input class="fc" id="manBC" placeholder="Type barcode…"><button class="btn btn-dk" onclick="useManBC()">Use</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QR LABEL PRINT -->
+<div class="mo" id="mBCPr">
+  <div class="md md-sm">
+    <div class="md-h"><div class="md-t">Print QR Label</div><button class="md-c" onclick="closeM('mBCPr')">✕</button></div>
+    <div class="md-b">
+      <div style="background:var(--surf);border:1px solid var(--bord);border-radius:10px;padding:16px;text-align:center;margin-bottom:18px">
+        <div id="bcPrQR" style="display:inline-block"></div>
+        <div id="bcPrNm" style="font-size:13px;font-weight:700;margin-top:8px"></div>
+        <div id="bcPrPr" style="font-size:12px;color:var(--ink2);margin-top:3px"></div>
+      </div>
+      <div class="fg fg2 mb3">
+        <div class="fgrp"><label class="flbl">No. of Copies</label><input class="fc" id="bcCopies" type="number" value="1" min="1" max="500"></div>
+        <div class="fgrp"><label class="flbl">Label Size</label>
+          <select class="fc" id="bcSz">
+            <option value="40x40">40×40 mm — Small square</option>
+            <option value="50x50" selected>50×50 mm — Standard</option>
+            <option value="60x40">60×40 mm — Wide tag</option>
+            <option value="80x80">80×80 mm — Large</option>
+          </select>
+        </div>
+      </div>
+      <div class="fgrp mb3">
+        <label class="flbl">Label Content</label>
+        <select class="fc" id="bcContent">
+          <option value="full">QR + Name + Brand + Price</option>
+          <option value="noname">QR + Price only</option>
+          <option value="both">QR + Retail + Wholesale Price</option>
+        </select>
+      </div>
+    </div>
+    <div class="md-f"><button class="btn btn-ou" onclick="closeM('mBCPr')">Close</button><button class="btn btn-dk" onclick="doPrintBC()">🖨 Print Labels</button></div>
+  </div>
+</div>
+
+<!-- CSV IMPORT -->
+<div class="mo" id="mCSV">
+  <div class="md md-sm">
+    <div class="md-h"><div class="md-t">Import Products via CSV</div><button class="md-c" onclick="closeM('mCSV')">✕</button></div>
+    <div class="md-b">
+      <div style="background:var(--gnd);border:1px solid var(--gnb);border-radius:var(--r);padding:12px 14px;font-size:12.5px;color:var(--gn);margin-bottom:16px">
+        📋 <strong>Columns:</strong> Barcode (optional), Product Name, Brand, Category, Unit, Purchase Rate, Retail Rate, Wholesale Rate<br>
+        <span style="font-size:11.5px;color:var(--ink2);margin-top:4px;display:block">
+          ✅ Leave <strong>Barcode blank</strong> — a unique one will be auto-generated.<br>
+          ✅ Lines starting with <strong>#</strong> are treated as comments and ignored.<br>
+          ✅ Products with a matching barcode will be <strong>updated</strong>, not duplicated.
+        </span>
+      </div>
+      <div class="fgrp mb3">
+        <label class="flbl">Select CSV File</label>
+        <input class="fc" type="file" id="csvFile" accept=".csv" style="padding:8px">
+      </div>
+      <div id="csvPreview" style="font-size:12.5px;color:var(--ink2);min-height:30px"></div>
+    </div>
+    <div class="md-f"><button class="btn btn-ou" onclick="closeM('mCSV')">Cancel</button><button class="btn btn-dk" onclick="uploadCSV()">⬆ Import</button></div>
+  </div>
+</div>
+
+<!-- UNIT -->
+<div class="mo" id="mUOM"><div class="md md-xs">
+  <div class="md-h"><div class="md-t" id="mUOMT">Add Unit</div><button class="md-c" onclick="closeM('mUOM')">✕</button></div>
+  <div class="md-b"><input type="hidden" id="eUOMId">
+    <div class="fg fg2">
+      <div class="fgrp"><label class="flbl">Unit Name <span class="req">*</span></label><input class="fc" id="uomN" placeholder="e.g. Piece, Meter, Kg"></div>
+      <div class="fgrp"><label class="flbl">Abbreviation</label><input class="fc" id="uomA" placeholder="e.g. Pcs, Mtr"></div>
+    </div>
+  </div>
+  <div class="md-f"><button class="btn btn-ou" onclick="closeM('mUOM')">Cancel</button><button class="btn btn-dk" onclick="saveUOM()">Save Unit</button></div>
+</div></div>
+
+<!-- BRAND -->
+<div class="mo" id="mBrand"><div class="md md-xs">
+  <div class="md-h"><div class="md-t" id="mBrandT">Add Brand</div><button class="md-c" onclick="closeM('mBrand')">✕</button></div>
+  <div class="md-b"><input type="hidden" id="eBrandId">
+    <div class="fgrp"><label class="flbl">Brand Name <span class="req">*</span></label><input class="fc" id="brandN" placeholder="e.g. Havells, Anchor, Polycab"></div>
+  </div>
+  <div class="md-f"><button class="btn btn-ou" onclick="closeM('mBrand')">Cancel</button><button class="btn btn-dk" onclick="saveBrand()">Save Brand</button></div>
+</div></div>
+
+<!-- SALE MODAL -->
+<div class="mo" id="mSale">
+  <div class="md md-lg">
+    <div class="md-h"><div class="md-t">New Sale</div><button class="md-c" onclick="closeM('mSale')">✕</button></div>
+    <div class="md-b">
+      <div class="mb4"><div class="fsec">Bill Details</div>
+        <div class="fg fg4">
+          <div class="fgrp"><label class="flbl">Customer Name</label><input class="fc" id="sCust" value="Guest"></div>
+          <div class="fgrp"><label class="flbl">Price Type</label><select class="fc" id="sPT" onchange="onSaleTypeChange()"><option value="retail">Retail Price</option><option value="wholesale">Wholesale Price</option></select></div>
+          <div class="fgrp"><label class="flbl">Payment Status</label><select class="fc" id="sStat"><option value="paid">Paid</option><option value="unpaid">Unpaid / Credit</option></select></div>
+          <div class="fgrp"><label class="flbl">Date</label><input class="fc" id="sDate" type="date"></div>
+        </div>
+      </div>
+      <div class="sec-h mb2"><div class="sec-t">Items</div><span style="font-size:12px;color:var(--ink3)">Search product by name or barcode. Not in catalog? Just type it with a price.</span></div>
+      <div style="overflow-x:auto">
+        <table class="items-tbl">
+          <thead><tr>
+            <th style="min-width:220px">Product / Item</th>
+            <th style="width:75px">Qty</th>
+            <th style="width:115px">Rate ₹</th>
+            <th style="width:105px">Discount ₹</th>
+            <th style="width:115px">Total ₹</th>
+            <th style="width:30px"></th>
+          </tr></thead>
+          <tbody id="saleTblBody"></tbody>
+        </table>
+      </div>
+      <div class="tot-bar">
+        <div class="tot-row"><span>Subtotal</span><span id="sSub" style="font-weight:700;font-family:var(--fm)">₹0.00</span></div>
+        <div class="tot-row"><span>Overall Discount ₹</span><input class="fc fc-sm" id="sDisc" type="number" value="0" min="0" style="width:130px;text-align:right" oninput="calcST()"></div>
+        <div class="tot-row"><span class="tot-grand">Grand Total</span><span class="tot-grand c-go" id="sGT">₹0.00</span></div>
+      </div>
+    </div>
+    <div class="md-f"><button class="btn btn-ou" onclick="closeM('mSale')">Cancel</button><button class="btn btn-dk" onclick="saveSale()">Complete Sale &amp; Print</button></div>
+  </div>
+</div>
+
+
+<!-- CATEGORY -->
+<div class="mo" id="mCat"><div class="md md-xs">
+  <div class="md-h"><div class="md-t" id="mCatT">Add Category</div><button class="md-c" onclick="closeM('mCat')">✕</button></div>
+  <div class="md-b"><input type="hidden" id="eCatId">
+    <div class="fgrp"><label class="flbl">Category Name <span class="req">*</span></label><input class="fc" id="catN" placeholder="e.g. Electrical Wire"></div>
+  </div>
+  <div class="md-f"><button class="btn btn-ou" onclick="closeM('mCat')">Cancel</button><button class="btn btn-dk" onclick="saveCat()">Save Category</button></div>
+</div></div>
+
+<!-- USER (with permission toggles) -->
+<div class="mo" id="mUser"><div class="md">
+  <div class="md-h"><div class="md-t" id="mUserT">Add User</div><button class="md-c" onclick="closeM('mUser')">✕</button></div>
+  <div class="md-b"><input type="hidden" id="eUId">
+    <div class="fg fg2 mb4">
+      <div class="fgrp"><label class="flbl">Full Name</label><input class="fc" id="uNm" placeholder="Full name"></div>
+      <div class="fgrp"><label class="flbl">Username <span class="req">*</span></label><input class="fc" id="uUsr" placeholder="login username"></div>
+      <div class="fgrp"><label class="flbl">Password <span class="req">*</span></label><input class="fc" id="uPw" type="password" placeholder="Leave blank to keep existing"></div>
+      <div class="fgrp"><label class="flbl">Role <span class="req">*</span></label>
+        <select class="fc" id="uRole" onchange="onRoleChange()"><option value="user">User (Custom Permissions)</option><option value="admin">Admin (Full Access)</option></select>
+      </div>
+    </div>
+    <div id="permSec">
+      <div class="fsec">Feature Access Control</div>
+      <table class="perm-table" id="permTbl"></table>
+    </div>
+  </div>
+  <div class="md-f"><button class="btn btn-ou" onclick="closeM('mUser')">Cancel</button><button class="btn btn-dk" onclick="saveUser()">Save User</button></div>
+</div></div>
+
+<!-- SA: Company Modal -->
+<div class="mo" id="mCo"><div class="md md-sm">
+  <div class="md-h"><div class="md-t" id="mCoT">Add Company</div><button class="md-c" onclick="closeM('mCo')">✕</button></div>
+  <div class="md-b"><input type="hidden" id="eCoId"><div class="fg">
+    <div class="fgrp"><label class="flbl">Company Name <span class="req">*</span></label><input class="fc" id="coNm" placeholder="e.g. My Electrical Store"></div>
+    <div class="fgrp"><label class="flbl">Admin Username <span class="req">*</span></label><input class="fc" id="coAdmU" placeholder="login username for admin"></div>
+    <div class="fgrp"><label class="flbl">Admin Password <span class="req">*</span></label><input class="fc" id="coAdmP" type="password" placeholder="strong password"><div class="fc-hint" id="coAdmPHint"></div></div>
+  </div></div>
+  <div class="md-f"><button class="btn btn-ou" onclick="closeM('mCo')">Cancel</button><button class="btn btn-dk" onclick="saveCo()">Save Company</button></div>
+</div></div>
+
+<!-- SA: Reset PW -->
+<div class="mo" id="mRst"><div class="md md-xs">
+  <div class="md-h"><div class="md-t" id="mRstT">Reset Password</div><button class="md-c" onclick="closeM('mRst')">✕</button></div>
+  <div class="md-b"><input type="hidden" id="rstCo"><input type="hidden" id="rstU">
+    <div class="fgrp"><label class="flbl">New Password <span class="req">*</span></label><input class="fc" id="rstPw" type="password" placeholder="Minimum 4 characters"></div>
+  </div>
+  <div class="md-f"><button class="btn btn-ou" onclick="closeM('mRst')">Cancel</button><button class="btn btn-dk" onclick="doRst()">Reset Password</button></div>
+</div></div>
+
+<!-- SA: View Company -->
+<div class="mo" id="mCoView"><div class="md md-lg">
+  <div class="md-h"><div class="md-t" id="mCoViewT">Company Details</div><button class="md-c" onclick="closeM('mCoView')">✕</button></div>
+  <div class="md-b" id="mCoViewB"></div>
+</div></div>
+
+<script>
+// ── QR Code Generator v2 — numeric & byte mode, ECC M, v1-6 ──
+// Encodes product info so any mobile scanner shows price on scan
+(function(){
+'use strict';
+var EX=new Uint8Array(512),LG=new Uint8Array(256);
+(function(){var x=1;for(var i=0;i<255;i++){EX[i]=EX[i+255]=x;LG[x]=i;x=(x<<1)^(x>=128?285:0)}})();
+function gm(a,b){return a&&b?EX[LG[a]+LG[b]]:0}
+function gp(n){var g=[1];for(var i=0;i<n;i++){var h=new Array(g.length+1).fill(0);for(var j=0;j<g.length;j++){h[j]^=g[j];h[j+1]^=gm(g[j],EX[i])}g=h}return g}
+function rs(d,n){var gen=gp(n),r=d.concat(new Array(n).fill(0));for(var i=0;i<d.length;i++){var c=r[i];if(c)for(var j=0;j<gen.length;j++)r[i+j]^=gm(c,gen[j])}return r.slice(d.length)}
+// [N, dataCW, eccPerBlock, blocks, alignR, alignC, numCap, byteCap] — ECC M
+var VC=[
+  [21,16,10,1,-1,-1,34,14],
+  [25,28,16,1,18,18,63,26],
+  [29,44,26,1,22,22,101,42],
+  [33,64,18,2,26,26,149,62],
+  [37,86,24,2,30,30,202,84],
+  [41,108,16,4,34,34,255,106]
+];
+// Format info: ECC M (00), masks 0-7
+var FI=[0x5412,0x5125,0x5E7C,0x5B4B,0x45F9,0x40CE,0x4F97,0x4AA0];
+window.QRsv=function(text,cs){
+  var s=String(text||'');
+  var isNum=/^\d+$/.test(s);
+  var capIdx=isNum?6:7;
+  var ver=0;while(ver<VC.length&&s.length>VC[ver][capIdx])ver++;
+  if(ver>=VC.length)return'<svg/>';
+  var vc=VC[ver],N=vc[0],dCW=vc[1],eCW=vc[2],blks=vc[3],aR=vc[4],aC=vc[5];
+  cs=cs||5;
+  // ── Build bit stream ──
+  var bits=[];
+  function pb(v,n){for(var i=n-1;i>=0;i--)bits.push((v>>i)&1)}
+  if(isNum){
+    pb(1,4);pb(s.length,10);
+    for(var i=0;i<s.length;){var r=s.length-i;if(r>=3){pb(parseInt(s.substr(i,3),10),10);i+=3}else if(r===2){pb(parseInt(s.substr(i,2),10),7);i+=2}else{pb(s.charCodeAt(i)-48,4);i++}}
+  } else {
+    pb(4,4);pb(s.length,8);
+    for(var i=0;i<s.length;i++)pb(s.charCodeAt(i)&0xFF,8);
+  }
+  pb(0,4);while(bits.length%8)bits.push(0);
+  for(var pi=0;bits.length<dCW*8;pi++)pb([0xEC,0x11][pi%2],8);
+  // ── Bytes → RS blocks ──
+  var db=[];for(var i=0;i<dCW*8;i+=8)db.push(bits.slice(i,i+8).reduce(function(a,b,j){return a|(b<<(7-j))},0));
+  var bsz=Math.floor(dCW/blks),ex=dCW%blks,dB=[],eB=[],pos=0;
+  for(var b=0;b<blks;b++){var l=bsz+(b<ex?1:0),sl=db.slice(pos,pos+l);dB.push(sl);eB.push(rs(sl,eCW));pos+=l}
+  var cw=[];
+  for(var i=0;i<bsz+(ex?1:0);i++)for(var b=0;b<blks;b++)if(i<dB[b].length)cw.push(dB[b][i]);
+  for(var i=0;i<eCW;i++)for(var b=0;b<blks;b++)cw.push(eB[b][i]);
+  var cb=[];for(var i=0;i<cw.length;i++)for(var j=7;j>=0;j--)cb.push((cw[i]>>j)&1);
+  // ── Build matrix ──
+  var m=[],fx=[];
+  for(var i=0;i<N;i++){m.push(new Array(N).fill(0));fx.push(new Array(N).fill(0))}
+  function sm(r,c,d){if(r>=0&&r<N&&c>=0&&c<N){m[r][c]=d?1:0;fx[r][c]=1}}
+  // Finder patterns + separators
+  function drawFinder(tr,tc){
+    for(var dr=-1;dr<=7;dr++)for(var dc=-1;dc<=7;dc++){
+      var r=tr+dr,c=tc+dc;if(r<0||r>=N||c<0||c>=N)continue;
+      if(dr<0||dr>6||dc<0||dc>6)sm(r,c,0);
+      else sm(r,c,dr===0||dr===6||dc===0||dc===6||(dr>=2&&dr<=4&&dc>=2&&dc<=4));
+    }
+  }
+  drawFinder(0,0);drawFinder(0,N-7);drawFinder(N-7,0);
+  // Timing patterns
+  for(var i=8;i<N-8;i++){if(!fx[6][i])sm(6,i,i%2===0);if(!fx[i][6])sm(i,6,i%2===0)}
+  // Dark module: row=4*(ver+1)+9-1 0-indexed = 4*ver+12
+  sm(4*ver+12,8,1);
+  // Alignment pattern (BEFORE format reservation, so it gets marked fixed)
+  if(aR>=0){
+    for(var dr=-2;dr<=2;dr++)for(var dc=-2;dc<=2;dc++){
+      var r=aR+dr,c=aC+dc;
+      if(r>=0&&r<N&&c>=0&&c<N&&!fx[r][c])
+        sm(r,c,(dr===0&&dc===0)||(Math.abs(dr)===2||Math.abs(dc)===2));
+    }
+  }
+  // Format info positions — reserve (mark fixed, values set later)
+  var f1=[[8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8],[7,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8]];
+  var f2=[[N-1,8],[N-2,8],[N-3,8],[N-4,8],[N-5,8],[N-6,8],[N-7,8],[8,N-8],[8,N-7],[8,N-6],[8,N-5],[8,N-4],[8,N-3],[8,N-2],[8,N-1]];
+  for(var i=0;i<15;i++){fx[f1[i][0]][f1[i][1]]=1;fx[f2[i][0]][f2[i][1]]=1}
+  // Data placement (right-to-left zigzag)
+  var bi=0,goUp=true;
+  for(var col=N-1;col>=0;col-=2){
+    if(col===6)col=5;
+    for(var row=0;row<N;row++){
+      var r2=goUp?N-1-row:row;
+      for(var dc2=0;dc2<2;dc2++){var c2=col-dc2;if(!fx[r2][c2])m[r2][c2]=bi<cb.length?cb[bi++]:0}
+    }
+    goUp=!goUp;
+  }
+  // Mask pattern 0: (r+c)%2===0
+  for(var r3=0;r3<N;r3++)for(var c3=0;c3<N;c3++)if(!fx[r3][c3]&&(r3+c3)%2===0)m[r3][c3]^=1;
+  // Write format info (ECC M=00, mask 0 → FI[0]=0x5412)
+  var fi=FI[0];
+  for(var i=0;i<15;i++){m[f1[i][0]][f1[i][1]]=(fi>>i)&1;m[f2[i][0]][f2[i][1]]=(fi>>(14-i))&1}
+  // Render SVG
+  var q=4,W=(N+2*q)*cs,rects='';
+  for(var r4=0;r4<N;r4++)for(var c4=0;c4<N;c4++)
+    if(m[r4][c4])rects+='<rect x="'+((c4+q)*cs)+'" y="'+((r4+q)*cs)+'" width="'+cs+'" height="'+cs+'"/>';
+  return'<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+W+'" viewBox="0 0 '+W+' '+W+'"><rect width="'+W+'" height="'+W+'" fill="#fff"/><g fill="#000">'+rects+'</g></svg>';
+};
+})();
+</script>
+</script>
+<script>
+'use strict';
+// Guard: if JsBarcode didn't load (blocked by CSP), make it a no-op
+if(typeof JsBarcode==='undefined'){window.JsBarcode=()=>{}}
+// Storage wrapper — falls back to in-memory if localStorage blocked
+const _mem={};
+const _ls={
+  getItem(k){try{return localStorage.getItem(k)}catch(e){return _mem[k]??null}},
+  setItem(k,v){try{localStorage.setItem(k,v)}catch(e){_mem[k]=v}},
+  removeItem(k){try{localStorage.removeItem(k)}catch(e){delete _mem[k]}},
+  keys(){try{return Object.keys(localStorage)}catch(e){return Object.keys(_mem)}}
+};
+// ════════════════════════════════════════════
+//   DATABASE
+// ════════════════════════════════════════════
+const DB={
+  get(k,d=[]){try{return JSON.parse(_ls.getItem('erp_'+k))??d}catch{return d}},
+  set(k,v){
+    _ls.setItem('erp_'+k,JSON.stringify(v));
+    if(typeof FP!=='undefined')FP.scheduleWrite();
+    const el=document.getElementById('saveStatus');
+    if(el){const t=new Date();el.textContent='Auto-saved '+t.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}
+  },
+  del(k){_ls.removeItem('erp_'+k);if(typeof FP!=='undefined')FP.scheduleWrite();}
+};
+let _cid=null;
+const cK=k=>'co_'+_cid+'_'+k;
+const gP=()=>DB.get(cK('prods'),[]);const sP=d=>DB.set(cK('prods'),d);
+const gS=()=>DB.get(cK('sales'),[]);const sS=d=>DB.set(cK('sales'),d);
+const gBr=()=>DB.get(cK('brands'),[]);const sBr=d=>DB.set(cK('brands'),d);
+const gUOM=()=>DB.get(cK('units'),[]);const sUOM=d=>DB.set(cK('units'),d);
+const gC=()=>DB.get(cK('cats'),[]);const sC=d=>DB.set(cK('cats'),d);
+const gU=()=>DB.get(cK('users'),[]);const sU=d=>DB.set(cK('users'),d);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+// Auto-generate a barcode that is guaranteed unique across all stored products
+function gbc(){
+  const existing = new Set((gP()||[]).map(p=>p.bc).filter(Boolean));
+  let bc, tries=0;
+  do {
+    // Format: KV + 10 digits (timestamp + random) = 12 chars, readable & scannable
+    bc = 'KV' + Date.now().toString().slice(-6) + Math.floor(Math.random()*9999).toString().padStart(4,'0');
+    tries++;
+  } while(existing.has(bc) && tries < 1000);
+  return bc;
+}
+const fD=ts=>new Date(ts).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+const fM=n=>'₹'+parseFloat(n||0).toFixed(2);
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+// ════════════════════════════════════════════
+//   DUMMY DATA
+// ════════════════════════════════════════════
+function injectDummy(cid){
+  // Write directly to localStorage using exact keys that gP/gS/etc will read
+  // gP() = DB.get('co_'+_cid+'_prods') = localStorage.getItem('erp_co_'+cid+'_prods')
+  function w(k,v){_ls.setItem('erp_co_'+cid+'_'+k, JSON.stringify(v))}
+
+  w('uoms',[
+    {id:'u01',name:'Piece',abbr:'Pcs',type:'Quantity'},{id:'u02',name:'Box',abbr:'Box',type:'Pack'},
+    {id:'u03',name:'Coil',abbr:'Coil',type:'Pack'},{id:'u04',name:'Bundle',abbr:'Bndl',type:'Pack'},
+    {id:'u05',name:'Meter',abbr:'Mtr',type:'Length'},{id:'u06',name:'Kilogram',abbr:'Kg',type:'Weight'},
+    {id:'u07',name:'Liter',abbr:'Ltr',type:'Volume'},{id:'u08',name:'Dozen',abbr:'Dz',type:'Pack'},
+    {id:'u09',name:'Set',abbr:'Set',type:'Quantity'},{id:'u10',name:'Roll',abbr:'Rll',type:'Pack'},
+    {id:'u11',name:'Carton',abbr:'Ctn',type:'Pack'},{id:'u12',name:'Sheet',abbr:'Sht',type:'Quantity'}
+  ]);
+  w('units',[
+    {id:'u01',name:'Piece',abbr:'Pcs'},{id:'u02',name:'Box',abbr:'Box'},
+    {id:'u03',name:'Meter',abbr:'Mtr'},{id:'u04',name:'Kilogram',abbr:'Kg'},
+    {id:'u05',name:'Liter',abbr:'Ltr'},{id:'u06',name:'Coil',abbr:'Coil'},
+    {id:'u07',name:'Bundle',abbr:'Bndl'},{id:'u08',name:'Roll',abbr:'Rll'},
+    {id:'u09',name:'Set',abbr:'Set'},{id:'u10',name:'Dozen',abbr:'Dz'},
+    {id:'u11',name:'Sheet',abbr:'Sht'},{id:'u12',name:'Carton',abbr:'Ctn'}
+  ]);
+  w('brands',[
+    {id:'br1',name:'Havells'},{id:'br2',name:'Anchor'},{id:'br3',name:'Polycab'},
+    {id:'br4',name:'Schneider'},{id:'br5',name:'Legrand'},{id:'br6',name:'Philips'},
+    {id:'br7',name:'Syska'},{id:'br8',name:'Supreme'},{id:'br9',name:'Crompton'},
+    {id:'br10',name:'Usha'},{id:'br11',name:'Stanley'},{id:'br12',name:'Fluke'},
+    {id:'br13',name:'Secure'},{id:'br14',name:'Hager'}
+  ]);
+  w('cats',[
+    {id:'c1',name:'Electrical Wire'},{id:'c2',name:'Switches & Sockets'},
+    {id:'c3',name:'MCB & RCCB'},{id:'c4',name:'Lighting'},
+    {id:'c5',name:'Conduit & Pipes'},{id:'c6',name:'Fans & Cooling'},
+    {id:'c7',name:'Extension & Tools'},{id:'c8',name:'Meters & Testers'}
+  ]);
+  w('sups',[
+    {id:'s1',name:'Havells India Ltd',phone:'9876543210',email:'orders@havells.com',addr:'New Delhi, Delhi'},
+    {id:'s2',name:'Anchor Electricals',phone:'9887654321',email:'anchor@dist.com',addr:'Mumbai, Maharashtra'},
+    {id:'s3',name:'Schneider Electric',phone:'9765432109',email:'schneider@dist.com',addr:'Pune, Maharashtra'},
+    {id:'s4',name:'Polycab Wires Ltd',phone:'9654321098',email:'polycab@wires.com',addr:'Vadodara, Gujarat'},
+    {id:'s5',name:'Philips Lighting',phone:'9543210987',email:'philips@light.com',addr:'Bengaluru, Karnataka'}
+  ]);
+  w('prods',[
+    {id:'p01',bc:'210045678901',name:'Copper Wire 2.5mm',co:'Havells',cat:'Electrical Wire',uom:'Meter',pp:45,rp:65,wp:58,stock:500,uoms:[{name:'Coil',qty:90},{name:'Bundle',qty:10}]},
+    {id:'p02',bc:'210045678902',name:'Copper Wire 1.5mm',co:'Polycab',cat:'Electrical Wire',uom:'Meter',pp:28,rp:42,wp:38,stock:750,uoms:[{name:'Coil',qty:90}]},
+    {id:'p03',bc:'210045678903',name:'Aluminium Wire 4mm',co:'Polycab',cat:'Electrical Wire',uom:'Meter',pp:32,rp:50,wp:44,stock:300,uoms:[{name:'Coil',qty:90}]},
+    {id:'p04',bc:'210045678904',name:'Modular Switch 6A',co:'Anchor',cat:'Switches & Sockets',uom:'Piece',pp:45,rp:75,wp:65,stock:200,uoms:[{name:'Box',qty:20}]},
+    {id:'p05',bc:'210045678905',name:'Socket 6A 3-Pin',co:'Anchor',cat:'Switches & Sockets',uom:'Piece',pp:55,rp:90,wp:80,stock:150,uoms:[{name:'Box',qty:10}]},
+    {id:'p06',bc:'210045678906',name:'MCB 32A Single Pole',co:'Schneider',cat:'MCB & RCCB',uom:'Piece',pp:180,rp:280,wp:250,stock:50,uoms:[]},
+    {id:'p07',bc:'210045678907',name:'MCB 16A Single Pole',co:'Schneider',cat:'MCB & RCCB',uom:'Piece',pp:145,rp:225,wp:200,stock:30,uoms:[]},
+    {id:'p08',bc:'210045678908',name:'RCCB 40A 30mA',co:'Legrand',cat:'MCB & RCCB',uom:'Piece',pp:480,rp:750,wp:680,stock:15,uoms:[]},
+    {id:'p09',bc:'210045678909',name:'LED Bulb 9W',co:'Syska',cat:'Lighting',uom:'Piece',pp:55,rp:90,wp:80,stock:300,uoms:[{name:'Box',qty:10}]},
+    {id:'p10',bc:'210045678910',name:'LED Tube Light 20W',co:'Philips',cat:'Lighting',uom:'Piece',pp:120,rp:195,wp:175,stock:80,uoms:[{name:'Box',qty:6}]},
+    {id:'p11',bc:'210045678911',name:'PVC Conduit 25mm',co:'Supreme',cat:'Conduit & Pipes',uom:'Meter',pp:18,rp:28,wp:25,stock:800,uoms:[{name:'Bundle',qty:30}]},
+    {id:'p12',bc:'210045678912',name:'Ceiling Fan 48in',co:'Crompton',cat:'Fans & Cooling',uom:'Piece',pp:1200,rp:1800,wp:1600,stock:12,uoms:[]},
+    {id:'p13',bc:'210045678913',name:'Table Fan 16in',co:'Usha',cat:'Fans & Cooling',uom:'Piece',pp:850,rp:1250,wp:1100,stock:4,uoms:[]},
+    {id:'p14',bc:'210045678914',name:'Extension Board 6m',co:'Havells',cat:'Extension & Tools',uom:'Piece',pp:220,rp:350,wp:310,stock:75,uoms:[{name:'Box',qty:6}]},
+    {id:'p15',bc:'210045678915',name:'Wire Stripper Tool',co:'Stanley',cat:'Extension & Tools',uom:'Piece',pp:85,rp:140,wp:120,stock:3,uoms:[]},
+    {id:'p16',bc:'210045678916',name:'Digital Multimeter',co:'Fluke',cat:'Meters & Testers',uom:'Piece',pp:650,rp:1050,wp:950,stock:8,uoms:[]},
+    {id:'p17',bc:'210045678917',name:'Energy Meter 5A',co:'Secure',cat:'Meters & Testers',uom:'Piece',pp:380,rp:620,wp:560,stock:20,uoms:[]},
+    {id:'p18',bc:'210045678918',name:'DB Box 8-way',co:'Hager',cat:'MCB & RCCB',uom:'Piece',pp:520,rp:850,wp:780,stock:18,uoms:[]}
+  ]);
+  const D=864e5, now=Date.now();
+  w('purs',[
+    {id:'pur001',date:now-7*D,supId:'s1',supName:'Havells India Ltd',ref:'HV-2024-0871',
+      items:[
+        {prodId:'p01',prodName:'Copper Wire 2.5mm',purUOM:'Coil',selUOM:'Meter',mult:90,qty:5,purPrc:3600,prcPerBase:40,newRP:65,newWP:58,lineTotal:18000},
+        {prodId:'p14',prodName:'Extension Board 6m',purUOM:'Box',selUOM:'Piece',mult:6,qty:3,purPrc:1200,prcPerBase:200,newRP:350,newWP:310,lineTotal:3600}
+      ],subtotal:21600,discount:600,grand:21000,notes:'Seasonal discount'},
+    {id:'pur002',date:now-5*D,supId:'s2',supName:'Anchor Electricals',ref:'ANC-2024-0234',
+      items:[
+        {prodId:'p04',prodName:'Modular Switch 6A',purUOM:'Box',selUOM:'Piece',mult:20,qty:5,purPrc:820,prcPerBase:41,newRP:75,newWP:65,lineTotal:4100},
+        {prodId:'p05',prodName:'Socket 6A 3-Pin',purUOM:'Box',selUOM:'Piece',mult:10,qty:8,purPrc:500,prcPerBase:50,newRP:90,newWP:80,lineTotal:4000}
+      ],subtotal:8100,discount:100,grand:8000,notes:''},
+    {id:'pur003',date:now-2*D,supId:'s3',supName:'Schneider Electric',ref:'SCH-2024-0099',
+      items:[
+        {prodId:'p06',prodName:'MCB 32A Single Pole',purUOM:'Piece',selUOM:'Piece',mult:1,qty:20,purPrc:165,prcPerBase:165,newRP:280,newWP:250,lineTotal:3300},
+        {prodId:'p07',prodName:'MCB 16A Single Pole',purUOM:'Piece',selUOM:'Piece',mult:1,qty:30,purPrc:130,prcPerBase:130,newRP:225,newWP:200,lineTotal:3900}
+      ],subtotal:7200,discount:200,grand:7000,notes:'Bulk order'}
+  ]);
+  w('sales',[
+    {id:'sal001',date:now-6*D,cust:'Ramesh Electricals',status:'paid',
+      items:[{pid:'p01',name:'Copper Wire 2.5mm',type:'catalog',qty:50,prc:65,disc:0,tot:3250},{pid:'p09',name:'LED Bulb 9W',type:'catalog',qty:10,prc:90,disc:0,tot:900}],
+      subtotal:4150,disc:150,grand:4000},
+    {id:'sal002',date:now-5*D,cust:'Guest',status:'paid',
+      items:[{pid:'p06',name:'MCB 32A',type:'catalog',qty:2,prc:280,disc:0,tot:560},{pid:'p04',name:'Modular Switch 6A',type:'catalog',qty:5,prc:75,disc:0,tot:375}],
+      subtotal:935,disc:0,grand:935},
+    {id:'sal003',date:now-3*D,cust:'Sharma Constructions',status:'unpaid',
+      items:[{pid:'p12',name:'Ceiling Fan 48in',type:'catalog',qty:3,prc:1800,disc:50,tot:5350},{pid:'p01',name:'Copper Wire 2.5mm',type:'catalog',qty:100,prc:65,disc:0,tot:6500}],
+      subtotal:11850,disc:500,grand:11350},
+    {id:'sal004',date:now-2*D,cust:'Patel Hardware',status:'paid',
+      items:[{pid:'p10',name:'LED Tube Light 20W',type:'catalog',qty:12,prc:195,disc:0,tot:2340},{pid:'p14',name:'Extension Board 6m',type:'catalog',qty:5,prc:350,disc:0,tot:1750}],
+      subtotal:4090,disc:90,grand:4000},
+    {id:'sal005',date:now-864e2,cust:'Mehta Builders',status:'paid',
+      items:[{pid:'p08',name:'RCCB 40A',type:'catalog',qty:4,prc:750,disc:0,tot:3000},{pid:'p06',name:'MCB 32A',type:'catalog',qty:8,prc:280,disc:0,tot:2240}],
+      subtotal:5240,disc:240,grand:5000},
+    {id:'sal006',date:now-1800e3,cust:'Guest',status:'paid',
+      items:[{pid:'p16',name:'Digital Multimeter',type:'catalog',qty:1,prc:1050,disc:0,tot:1050}],
+      subtotal:1050,disc:0,grand:1050}
+  ]);
+  w('users',[
+    {id:'usr01',u:'admin',p:'admin@123',name:'Kartik Singh',role:'admin',perms:['products','sales','pricelist','categories','brands','units']},
+    {id:'usr02',u:'sales1',p:'1234',name:'Ravi Sharma',role:'user',perms:['sales','pricelist']},
+    {id:'usr03',u:'purchase1',p:'1234',name:'Meera Patel',role:'user',perms:['products']},
+    {id:'usr04',u:'accountant',p:'1234',name:'Suresh Kumar',role:'user',perms:['sales','pricelist']},
+    {id:'usr05',u:'viewer',p:'1234',name:'Ankit Joshi',role:'user',perms:['pricelist']}
+  ]);
+}
+
+// ════════════════════════════════════════════
+//   AUTH
+// ════════════════════════════════════════════
+const ALL_P=['products','sales','pricelist','categories','brands','units'];
+const P_ICONS={products:'📦',sales:'💰',pricelist:'🏷️',categories:'📂',brands:'🏷️',units:'📐'};
+const P_DESC={products:'Product catalog',sales:'Sales & billing',pricelist:'View & print prices',categories:'Product categories',brands:'Brand & manufacturer list',units:'Units of measure'};
+const ST={role:null,cid:null,uid:null,u:null,name:null,perms:[],coName:null};
+
+
+
+
+
+// ════════════════════════════════════════════
+//   APP INIT
+// ════════════════════════════════════════════
+function initApp(){
+  document.getElementById('sbCoName').textContent=ST.coName||'Company';
+  document.getElementById('sbAv').textContent=(ST.name||'A')[0].toUpperCase();
+  document.getElementById('sbUn').textContent=ST.name||ST.u;
+  document.getElementById('sbUr').textContent=ST.role==='admin'?'Company Admin':'Staff';
+  const perms=ST.perms,isAdmin=ST.role==='admin';
+  ALL_P.forEach(pg=>{document.querySelectorAll('.perm-'+pg).forEach(el=>el.style.display=perms.includes(pg)?'':'none')});
+  document.querySelectorAll('.perm-masters').forEach(el=>el.style.display=(perms.includes('categories')||perms.includes('brands')||perms.includes('units'))?'':'none');
+  document.querySelectorAll('.admin-only').forEach(el=>el.style.display=isAdmin?'':'none');
+  showPage('products');
+}
+const pageRen={products:renderProds,sales:rSales,pricelist:renderPL,categories:rCat,brands:rBrand,units:rUOM,adminPanel:rAdmin};
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(b=>b.classList.remove('on'));
+  const pg=document.getElementById('page-'+name);if(pg)pg.classList.add('on');
+  document.querySelectorAll('.ni').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+name+"'"))b.classList.add('on')});
+  pageRen[name]?.();
+}
+
+// ════════════════════════════════════════════
+//   TOAST & MODAL
+// ════════════════════════════════════════════
+let _tt;
+function toast(msg,type='success'){const t=document.getElementById('toast');document.getElementById('toastM').textContent=msg;document.getElementById('toastI').textContent={success:'✓',error:'✕',info:'ℹ'}[type]||'✓';t.className='toast show '+type;clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),3400)}
+const openM=id=>document.getElementById(id).classList.add('open');
+const closeM=id=>document.getElementById(id).classList.remove('open');
+document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+
+// ════════════════════════════════════════════
+//   VALIDATION
+// ════════════════════════════════════════════
+function vReq(id,msg){const el=document.getElementById(id);clearErr(id);if(!(el?.value||'').trim()){showErr(id,msg||'Required');return false}return true}
+function vNum(id,msg,mn=0){const el=document.getElementById(id);clearErr(id);const v=parseFloat(el?.value);if(isNaN(v)||v<mn){showErr(id,msg||`Must be ≥${mn}`);return false}return true}
+function showErr(id,msg){const el=document.getElementById(id);el?.classList.add('err');let e=document.getElementById('ve_'+id);if(!e){e=document.createElement('div');e.id='ve_'+id;e.className='field-err';el?.parentNode?.appendChild(e)}e.textContent=msg}
+function clearErr(id){document.getElementById(id)?.classList.remove('err');document.getElementById('ve_'+id)?.remove()}
+
+// ════════════════════════════════════════════
+//   PRODUCTS
+// ════════════════════════════════════════════
+// ─── Inline price editing ───
+// Tracks pending price changes: { prodId_field: newValue }
+const _dirtyPrices = {};
+
+function markPriceDirty(prodId, field, val){
+  _dirtyPrices[prodId+'_'+field] = parseFloat(val);
+  // Show save button on whichever page is active
+  ['savePricesBtn','savePricesBtnPL'].forEach(id=>{
+    const btn = document.getElementById(id);
+    if(btn && btn.closest('.page.on')) btn.style.display = 'inline-flex';
+    else if(btn) btn.style.display = 'inline-flex'; // show on both — harmless if hidden page
+  });
+  document.getElementById('savePricesBtn').style.display='inline-flex';
+  document.getElementById('savePricesBtnPL').style.display='inline-flex';
+}
+
+function saveAllPrices(){
+  if(!Object.keys(_dirtyPrices).length) return;
+  const prods = gP();
+  for(const key of Object.keys(_dirtyPrices)){
+    const [prodId, field] = key.split(/_(.+)/); // split on first underscore only (id may have more)
+    // find product by id prefix match
+    const idx = prods.findIndex(p => key.startsWith(p.id+'_'));
+    if(idx < 0) continue;
+    const f = key.slice(prods[idx].id.length + 1);
+    const v = _dirtyPrices[key];
+    if(!isNaN(v) && v >= 0) prods[idx][f] = v;
+  }
+  sP(prods);
+  // Clear dirty
+  for(const k of Object.keys(_dirtyPrices)) delete _dirtyPrices[k];
+  // Hide buttons
+  document.getElementById('savePricesBtn').style.display='none';
+  document.getElementById('savePricesBtnPL').style.display='none';
+  toast('All prices saved ✓');
+  // Sync other page inputs (both pages may be rendered)
+  prods.forEach(p=>{
+    ['pp','rp','wp'].forEach(f=>{
+      ['pi','pl'].forEach(pfx=>{
+        const inp = document.getElementById(pfx+'_'+p.id+'_'+f);
+        if(inp && inp !== document.activeElement) inp.value = parseFloat(p[f]||0).toFixed(2);
+      });
+    });
+  });
+}
+
+function priceInput(prodId, field, val, cls, prefix){
+  prefix = prefix || 'pi';
+  return `<input class="price-inp ${cls}" type="number" min="0" step="0.01"
+    id="${prefix}_${prodId}_${field}"
+    value="${parseFloat(val||0).toFixed(2)}"
+    oninput="markPriceDirty('${prodId}','${field}',this.value)"
+    onkeydown="if(event.key==='Enter'){saveAllPrices();event.preventDefault()}"
+    title="Edit price — click Save in top right to apply">`;
+}
+
+function renderProds(){
+  const prods=gP(),q=(document.getElementById('pSrch')?.value||'').toLowerCase(),cat=document.getElementById('pCatF')?.value||'',cmp=document.getElementById('pCmpF')?.value||'';
+  const cats=[...new Set(prods.map(p=>p.cat).filter(Boolean))].sort();
+  const cmps=[...new Set(prods.map(p=>p.co).filter(Boolean))].sort();
+  document.getElementById('pCatF').innerHTML='<option value="">All Categories</option>'+cats.map(c=>`<option value="${esc(c)}"${c===cat?' selected':''}>${esc(c)}</option>`).join('');
+  document.getElementById('pCmpF').innerHTML='<option value="">All Brands</option>'+cmps.map(c=>`<option value="${esc(c)}"${c===cmp?' selected':''}>${esc(c)}</option>`).join('');
+  const list=prods.filter(p=>{
+    if(q&&!(p.name.toLowerCase().includes(q)||(p.co||'').toLowerCase().includes(q)||(p.bc||'').includes(q)))return false;
+    if(cat&&p.cat!==cat)return false;if(cmp&&p.co!==cmp)return false;
+    return true;
+  });
+  const tb=document.getElementById('prodTb');
+  if(!list.length){tb.innerHTML='<tr><td colspan="10"><div class="empty"><div class="empty-i">📦</div><p>No products found</p></div></td></tr>';return}
+  tb.innerHTML=list.map(p=>`<tr>
+    <td><div class="bc-cell"><div class="bc-img"><svg id="bc_${p.id}"></svg></div><div class="bc-code">${esc(p.bc)}</div><button class="btn btn-ou btn-xs" onclick="openBCPr('${p.id}')" style="margin-top:4px">🖨 Label</button></div></td>
+    <td><div style="font-weight:600">${esc(p.name)}</div></td>
+    <td style="color:var(--ink2)">${esc(p.co||'—')}</td>
+    <td>${p.cat?`<span class="badge b-bl">${esc(p.cat)}</span>`:'—'}</td>
+    <td><span class="badge b-nt">${esc(p.uom||'Pcs')}</span></td>
+    <td>${priceInput(p.id,'pp',p.pp,'pp','pi')}</td>
+    <td>${priceInput(p.id,'rp',p.rp,'rp','pi')}</td>
+    <td>${priceInput(p.id,'wp',p.wp,'wp','pi')}</td>
+    <td><div style="display:flex;gap:6px"><button class="btn btn-ou btn-sm" onclick="openProdModal('${p.id}')">Edit</button><button class="btn btn-rd btn-sm" onclick="delProd('${p.id}')">✕</button></div></td>
+  </tr>`).join('');
+  setTimeout(()=>list.forEach(p=>{const el=document.getElementById('bc_'+p.id);if(el)try{JsBarcode(el,p.bc||'000000000000',{format:'CODE128',width:1.4,height:36,displayValue:false,margin:2,background:'#fff',lineColor:'#1a1410'})}catch{}}),60);
+}
+function openProdModal(id=''){
+  clearErr('pN');clearErr('pCo');clearErr('pCa');clearErr('pU');clearErr('pPP');clearErr('pRP');clearErr('pWP');clearErr('pBC');
+  document.getElementById('epId').value=id;document.getElementById('mProdT').textContent=id?'Edit Product':'Add Product';
+  const cats=gC();document.getElementById('pCa').innerHTML='<option value="">— Select Category —</option>'+cats.map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+  const brands=gBr();document.getElementById('pCo').innerHTML='<option value="">— Select Brand —</option>'+brands.map(b=>`<option value="${esc(b.name)}">${esc(b.name)}</option>`).join('');
+  const p=id?gP().find(x=>x.id===id):null;
+  document.getElementById('pBC').value=p?.bc||'';document.getElementById('pN').value=p?.name||'';
+  if(p?.co){[...document.getElementById('pCo').options].forEach(o=>{if(o.value===p.co)o.selected=true})}
+  const units=gUOM();document.getElementById('pU').innerHTML='<option value="">— Select Unit —</option>'+units.map(u=>`<option value="${esc(u.name)}">${esc(u.name)}${u.abbr?' ('+esc(u.abbr)+')':''}</option>`).join('');
+  if(p?.uom){[...document.getElementById('pU').options].forEach(o=>{if(o.value===p.uom)o.selected=true})}
+  document.getElementById('pPP').value=p?.pp||'';document.getElementById('pRP').value=p?.rp||'';document.getElementById('pWP').value=p?.wp||'';
+  if(p?.cat){[...document.getElementById('pCa').options].forEach(o=>{if(o.value===p.cat)o.selected=true})}
+  openM('mProd');
+}
+function saveProd(){
+  let ok=vReq('pN','Product name is required')&&vReq('pCo','Brand is required')&&vReq('pCa','Category is required')&&vReq('pU','Base unit is required')&&vNum('pPP','Enter valid purchase price')&&vNum('pRP','Enter valid retail price')&&vNum('pWP','Enter valid wholesale price');
+  if(!ok)return;
+  const pp=parseFloat(document.getElementById('pPP').value),rp=parseFloat(document.getElementById('pRP').value),wp=parseFloat(document.getElementById('pWP').value);
+  const pU=document.getElementById('pU')?.value.trim()||'';
+  if(!pU){showErr('pU','Unit is required');return}
+  const prods=gP(),eid=document.getElementById('epId').value;
+  const bc=document.getElementById('pBC').value.trim()||gbc();
+  if(!eid&&prods.find(p=>p.bc===bc)){showErr('pBC','Barcode already exists');return}
+  const obj={name:document.getElementById('pN').value.trim(),bc,co:document.getElementById('pCo').value,cat:document.getElementById('pCa').value,uom:pU,pp,rp,wp};
+  if(eid){const i=prods.findIndex(x=>x.id===eid);if(i>-1)prods[i]={...prods[i],...obj}}else prods.push({id:uid(),...obj});
+  sP(prods);closeM('mProd');renderProds();toast(eid?'Product updated!':'Product added with barcode!');
+}
+function delProd(id){if(!confirm('Delete this product?'))return;sP(gP().filter(p=>p.id!==id));renderProds();toast('Deleted','info')}
+
+// ════════════════════════════════════════════
+//   SCANNER  — context: 'product' | 'purchase' | 'general'
+// ════════════════════════════════════════════
+let _ss=null,_si=null,_scanCtx='general';
+function openScanModal(ctx='general'){
+  _scanCtx=ctx;
+  document.getElementById('manBC').value='';
+  document.getElementById('scanMsg').textContent='Initialising camera…';
+  openM('mScan');startScan();
+}
+async function startScan(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280}}});
+    _ss=stream;const vid=document.getElementById('scanVid');vid.srcObject=stream;await vid.play();
+    if('BarcodeDetector' in window){
+      const det=new BarcodeDetector({formats:['code_128','ean_13','ean_8','code_39','qr_code','upc_a','upc_e']});
+      document.getElementById('scanMsg').textContent='Point camera at barcode…';
+      _si=setInterval(async()=>{try{const codes=await det.detect(vid);if(codes.length)useScan(codes[0].rawValue)}catch{}},280);
+    } else document.getElementById('scanMsg').textContent='Auto-scan not supported in this browser — use manual input below.';
+  } catch { document.getElementById('scanMsg').textContent='Camera not accessible — use manual input below.'; }
+}
+function stopScan(){clearInterval(_si);_si=null;if(_ss){_ss.getTracks().forEach(t=>t.stop());_ss=null}closeM('mScan')}
+function useScan(val){
+  stopScan();
+  // QR labels encode "barcode\nMRP:Rs.XX" — extract first line as barcode
+  const bc=(val||'').split('\n')[0].trim();
+  if(_scanCtx==='product'){
+    document.getElementById('pBC').value=bc;toast('Scanned: '+bc);
+  } else {
+    const p=gP().find(x=>x.bc===bc);
+    if(p){toast('Found: '+p.name,'info');openProdModal(p.id)}
+    else{openProdModal();setTimeout(()=>document.getElementById('pBC').value=bc,120)}
+  }
+}
+function useManBC(){const v=document.getElementById('manBC').value.trim();if(!v){toast('Enter barcode','error');return}useScan(v)}
+
+// ════════════════════════════════════════════
+//   BARCODE PRINT
+// ════════════════════════════════════════════
+let _bpId='';
+function openBCPr(id){
+  _bpId=id;
+  const p=gP().find(x=>x.id===id);
+  if(!p)return;
+  document.getElementById('bcPrNm').textContent=p.name+(p.co?' · '+p.co:'');
+  document.getElementById('bcPrPr').textContent='Retail: '+fM(p.rp)+(p.wp?' | WS: '+fM(p.wp):'');
+  document.getElementById('bcCopies').value=1;
+  const qrText=p.bc+'\nMRP:Rs.'+parseFloat(p.rp).toFixed(2)+(p.co?'\n'+p.co:'');
+  const qrEl=document.getElementById('bcPrQR');
+  if(qrEl)qrEl.innerHTML=window.QRsv?QRsv(qrText,5):'';
+  openM('mBCPr');
+}
+
+function doPrintBC(){
+  const p=gP().find(x=>x.id===_bpId);
+  if(!p){toast('Product not found','error');return}
+  const copies=Math.max(1,Math.min(500,parseInt(document.getElementById('bcCopies').value)||1));
+  const szKey=document.getElementById('bcSz').value;
+  const ct=document.getElementById('bcContent').value;
+  // Label size map [w_mm, h_mm, qr_cell_px, name_pt, price_pt]
+  const szMap={'40x40':[40,40,4,6,8],'50x50':[50,50,5,7,10],'60x40':[60,40,4,6.5,9],'80x80':[80,80,7,9,12]};
+  const [w,h,qrCell,fs,pfs]=szMap[szKey]||szMap['50x50'];
+  const showName=ct!=='noname',showBrand=ct!=='noname'&&p.co,showWS=ct==='both';
+  function makeLabel(){
+    const qrText2=p.bc+'\nMRP:Rs.'+parseFloat(p.rp).toFixed(2);
+    const qrSvg=window.QRsv?QRsv(qrText2,qrCell):'';
+    return `<div style="width:${w}mm;height:${h}mm;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2mm;box-sizing:border-box;font-family:Arial,sans-serif;border:0.2mm solid #eee;page-break-inside:avoid">
+      <div style="flex:1;display:flex;align-items:center;justify-content:center">${qrSvg}</div>
+      <div style="font-size:${fs}pt;color:#555;word-break:break-all;text-align:center;max-width:${w-4}mm;line-height:1.2">${esc(p.bc)}</div>
+      ${showName?`<div style="font-size:${fs}pt;font-weight:700;text-align:center;max-width:${w-4}mm;margin-top:1mm;line-height:1.2">${esc(p.name)}</div>`:''}
+      ${showBrand?`<div style="font-size:${fs-1}pt;color:#666;text-align:center">${esc(p.co)}</div>`:''}
+      <div style="font-size:${pfs}pt;font-weight:700;margin-top:1mm">₹${parseFloat(p.rp).toFixed(2)}</div>
+      ${showWS?`<div style="font-size:${fs-1}pt;color:#555">WS: ₹${parseFloat(p.wp).toFixed(2)}</div>`:''}
+    </div>`;
+  }
+  let labels='';for(let i=0;i<copies;i++)labels+=makeLabel();
+  const pageStyle=`@media print{@page{size:${w}mm ${h}mm;margin:0}body{margin:0;padding:0}.label-wrap{page-break-after:always}}`;
+  doPrint(`<style>${pageStyle}</style><div>${labels}</div>`,{size:'custom'});
+  closeM('mBCPr');
+}
+
+//   SALES — UNIFIED SEARCH ROW, ALLOW ANY STOCK
+// ════════════════════════════════════════════
+let _sI=[];
+
+function rSales(){
+  const sales=gS();
+  document.getElementById('saleTb').innerHTML=[...sales].reverse().map((s,i)=>{
+    const num=String(sales.length-i).padStart(4,'0');
+    return`<tr>
+      <td class="mono">#${num}</td>
+      <td>${fD(s.date)}</td>
+      <td style="font-weight:600">${esc(s.cust||'Guest')}</td>
+      <td><span class="badge b-bl">${s.items?.length||0} item${s.items?.length!==1?'s':''}</span></td>
+      <td style="color:var(--rd);font-family:var(--fm)">${(s.disc||0)>0?'−'+fM(s.disc):'—'}</td>
+      <td style="font-family:var(--fm);font-weight:700;color:var(--gn)">${fM(s.grand)}</td>
+      <td><span class="badge ${s.status==='paid'?'b-gn':'b-rd'}">${s.status||'unpaid'}</span></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-ou btn-sm" onclick='printRcp(${JSON.stringify(s).replace(/'/g,"&#39;")})'>🖨 Receipt</button>
+        <button class="btn btn-rd btn-sm" onclick="delSale('${s.id}')">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="8"><div class="empty"><div class="empty-i">💰</div><p>No sales yet</p></div></td></tr>';
+}
+
+function openSaleModal(){
+  _sI=[];
+  document.getElementById('sCust').value='Guest';
+  document.getElementById('sPT').value='retail';
+  document.getElementById('sStat').value='paid';
+  document.getElementById('sDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('sDisc').value='0';
+  document.getElementById('sSub').textContent='₹0.00';
+  document.getElementById('sGT').textContent='₹0.00';
+  document.getElementById('saleTblBody').innerHTML='';
+  addSaleRow();
+  openM('mSale');
+}
+
+function addSaleRow(){
+  const i=_sI.length;
+  _sI.push({type:'search',pid:null,name:'',qty:1,prc:0,disc:0});
+  const prods=gP();
+  const tr=document.createElement('tr');tr.id='sr_'+i;
+  const opts=prods.map(p=>`<option value="${esc(p.name)}" data-id="${p.id}" data-bc="${esc(p.bc)}" data-rp="${p.rp}" data-wp="${p.wp}">${esc(p.name)} (${esc(p.bc)})</option>`).join('');
+  tr.innerHTML=`
+    <td>
+      <input class="fc fc-sm" id="sn_${i}" placeholder="Search product name or barcode…" list="dl_sn_${i}" autocomplete="off"
+        oninput="onSSearch(${i},this.value)" onchange="onSSearch(${i},this.value)">
+      <datalist id="dl_sn_${i}">${opts}</datalist>
+      <div id="snhint_${i}" style="font-size:10px;margin-top:2px"></div>
+    </td>
+    <td><input class="fc fc-sm" type="number" min="1" value="1" id="sq_${i}" style="text-align:center" oninput="onSQ(${i},this.value)"></td>
+    <td><input class="fc fc-sm" type="number" min="0" step="any" id="sp_${i}" placeholder="Rate ₹" oninput="onSPrc(${i},this.value)"></td>
+    <td><input class="fc fc-sm" type="number" min="0" value="0" id="sd_${i}" oninput="onSD(${i},this.value)"></td>
+    <td class="it-total" id="st_${i}">—</td>
+    <td><button class="btn btn-rd btn-icon btn-sm" onclick="rmSaleRow(${i})">✕</button></td>`;
+  document.getElementById('saleTblBody').appendChild(tr);
+}
+
+function onSSearch(i,val){
+  if(!val)return;
+  const prods=gP();
+  // Match by exact name from datalist or barcode
+  const p=prods.find(x=>x.name===val)||prods.find(x=>x.bc===val.trim());
+  const type=document.getElementById('sPT')?.value||'retail';
+  if(p){
+    // Catalog product found
+    _sI[i]={type:'catalog',pid:p.id,name:p.name,qty:_sI[i].qty||1,prc:type==='retail'?p.rp:p.wp,disc:0};
+    const pf=document.getElementById('sp_'+i);if(pf)pf.value=_sI[i].prc;
+    const hint=document.getElementById('snhint_'+i);
+    if(hint)hint.innerHTML=`<span style="color:var(--gn)">✓ ${esc(p.co||'')} ${esc(p.uom||'')}</span>`;
+    // Auto-add row if last
+    if(i===_sI.length-1)addSaleRow();
+  } else {
+    // Custom / free-text item
+    _sI[i]={type:'custom',pid:null,name:val,qty:_sI[i].qty||1,prc:_sI[i].prc||0,disc:0};
+    const hint=document.getElementById('snhint_'+i);
+    if(hint&&val.length>1)hint.innerHTML=`<span style="color:var(--gold)">★ Custom item — enter price manually</span>`;
+    // Auto-add row if last and has meaningful content
+    if(i===_sI.length-1&&val.length>2)addSaleRow();
+  }
+  updateSaleRow(i);calcST();
+}
+
+function rmSaleRow(i){
+  if(_sI.length<=1){toast('At least one item required','error');return}
+  document.getElementById('sr_'+i)?.remove();_sI.splice(i,1);
+  // Re-number
+  [...document.getElementById('saleTblBody').querySelectorAll('tr')].forEach((tr,ni)=>{
+    tr.id='sr_'+ni;
+    tr.querySelectorAll('[id]').forEach(el=>{el.id=el.id.replace(/_\d+$/,'_'+ni)});
+    tr.querySelectorAll('[oninput],[onchange]').forEach(el=>{
+      ['oninput','onchange'].forEach(ev=>{const v=el.getAttribute(ev);if(v)el.setAttribute(ev,v.replace(/\d+/g,String(ni)))});
+    });
+    tr.querySelectorAll('button[onclick]').forEach(btn=>{const v=btn.getAttribute('onclick');if(v)btn.setAttribute('onclick',v.replace(/\d+/,String(ni)))});
+  });
+  _sI.forEach((_,ni)=>updateSaleRow(ni));calcST();
+}
+
+function onSQ(i,v){if(_sI[i]){_sI[i].qty=parseFloat(v)||1;updateSaleRow(i);calcST()}}
+function onSPrc(i,v){if(_sI[i]){_sI[i].prc=parseFloat(v)||0;updateSaleRow(i);calcST()}}
+function onSD(i,v){if(_sI[i]){_sI[i].disc=parseFloat(v)||0;updateSaleRow(i);calcST()}}
+function updateSaleRow(i){
+  const it=_sI[i];if(!it)return;
+  const tot=Math.max(0,(it.qty||1)*(it.prc||0)-(it.disc||0));
+  const el=document.getElementById('st_'+i);
+  if(el)el.textContent=(it.pid||it.name)?fM(tot):'—';
+}
+function onSaleTypeChange(){
+  const type=document.getElementById('sPT').value,prods=gP();
+  _sI.forEach((it,i)=>{
+    if(it.type==='catalog'&&it.pid){
+      const p=prods.find(x=>x.id===it.pid);
+      if(p){it.prc=type==='retail'?p.rp:p.wp;const pf=document.getElementById('sp_'+i);if(pf)pf.value=it.prc;updateSaleRow(i)}
+    }
+  });calcST();
+}
+function calcST(){
+  const sub=_sI.reduce((a,it)=>a+Math.max(0,(it.qty||1)*(it.prc||0)-(it.disc||0)),0);
+  const disc=parseFloat(document.getElementById('sDisc')?.value)||0;
+  document.getElementById('sSub').textContent=fM(sub);
+  document.getElementById('sGT').textContent=fM(Math.max(0,sub-disc));
+}
+function saveSale(){
+  const valid=_sI.filter(it=>(it.pid||it.name)&&(it.qty||0)>0&&(it.prc||0)>=0);
+  if(!valid.length){toast('Add at least one item','error');return}
+  if(!document.getElementById('sDate').value){toast('Date is required','error');return}
+  for(const it of valid){
+    if((it.disc||0)>(it.qty||1)*(it.prc||0)){toast('Item discount exceeds item total','error');return}
+  }
+  const sub=valid.reduce((a,it)=>a+Math.max(0,(it.qty||1)*(it.prc||0)-(it.disc||0)),0);
+  const disc=parseFloat(document.getElementById('sDisc').value)||0;
+  if(disc>sub){toast('Discount exceeds subtotal','error');return}
+  const sales=gS();
+  const sale={id:uid(),date:new Date(document.getElementById('sDate').value).getTime()||Date.now(),
+    cust:document.getElementById('sCust').value.trim()||'Guest',
+    status:document.getElementById('sStat').value,
+    items:valid.map(it=>({pid:it.pid||null,name:it.name,type:it.type,qty:it.qty,prc:it.prc,disc:it.disc||0,tot:Math.max(0,(it.qty||1)*(it.prc||0)-(it.disc||0))})),
+    subtotal:sub,disc,grand:Math.max(0,sub-disc)};
+  sales.push(sale);sS(sales);
+  closeM('mSale');rSales();toast('Sale completed!');
+  setTimeout(()=>printRcp(sale),400);
+}
+function delSale(id){if(!confirm('Delete this sale?'))return;sS(gS().filter(s=>s.id!==id));rSales();toast('Deleted','info')}
+
+let _plSel=new Set();
+function renderPL(){
+  const prods=gP(),q=(document.getElementById('plSrch')?.value||'').toLowerCase(),cat=document.getElementById('plCatF')?.value||'',co=document.getElementById('plCoF')?.value||'',srt=document.getElementById('plSort')?.value||'name-asc';
+  const cats=[...new Set(prods.map(p=>p.cat).filter(Boolean))].sort();
+  const cos=[...new Set(prods.map(p=>p.co).filter(Boolean))].sort();
+  document.getElementById('plCatF').innerHTML='<option value="">All</option>'+cats.map(c=>`<option value="${esc(c)}"${c===cat?' selected':''}>${esc(c)}</option>`).join('');
+  document.getElementById('plCoF').innerHTML='<option value="">All</option>'+cos.map(c=>`<option value="${esc(c)}"${c===co?' selected':''}>${esc(c)}</option>`).join('');
+  let list=prods.filter(p=>{if(q&&!(p.name.toLowerCase().includes(q)||(p.co||'').toLowerCase().includes(q)))return false;return(!cat||p.cat===cat)&&(!co||p.co===co)});
+  const[sf,sd]=srt.split('-');list.sort((a,b)=>{const av=sf==='name'?(a.name||''):(sf==='rp'?(a.rp||0):(a.wp||0)),bv=sf==='name'?(b.name||''):(sf==='rp'?(b.rp||0):(b.wp||0));return sd==='asc'?(av>bv?1:-1):(av<bv?1:-1)});
+  document.getElementById('plTb').innerHTML=list.map(p=>`<tr>
+    <td><input type="checkbox" style="cursor:pointer;width:15px;height:15px" ${_plSel.has(p.id)?'checked':''} onchange="plTog('${p.id}',this.checked)"></td>
+    <td><div style="font-weight:600">${esc(p.name)}</div></td>
+    <td style="color:var(--ink2)">${esc(p.co||'—')}</td>
+    <td>${p.cat?`<span class="badge b-bl">${esc(p.cat)}</span>`:'—'}</td>
+    <td><span class="badge b-nt">${esc(p.uom||'Pcs')}</span></td>
+    <td>${priceInput(p.id,'pp',p.pp,'pp','pl')}</td>
+    <td>${priceInput(p.id,'rp',p.rp,'rp','pl')}</td>
+    <td>${priceInput(p.id,'wp',p.wp,'wp','pl')}</td>
+  </tr>`).join('')||'<tr><td colspan="8"><div class="empty"><p>No products match</p></div></td></tr>';
+}
+function plTog(id,c){if(c)_plSel.add(id);else _plSel.delete(id)}
+function plTogAll(c){gP().forEach(p=>c?_plSel.add(p.id):_plSel.delete(p.id));renderPL()}
+function plSelAll(){document.getElementById('plCA').checked=true;plTogAll(true)}
+function plClrAll(){document.getElementById('plCA').checked=false;plTogAll(false)}
+function printPL(){
+  const prods=gP();
+  const list=_plSel.size>0?prods.filter(p=>_plSel.has(p.id)):prods;
+  if(!list.length){toast('No products selected','error');return}
+  const rows=list.map((p,i)=>`<tr>
+    <td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(p.co||'—')}</td><td>${esc(p.cat||'—')}</td>
+    <td>${esc(p.uom||'Pcs')}</td>
+    <td>₹${parseFloat(p.pp||0).toFixed(2)}</td>
+    <td>₹${parseFloat(p.rp||0).toFixed(2)}</td>
+    <td>₹${parseFloat(p.wp||0).toFixed(2)}</td>
+  </tr>`).join('');
+  doPrint(`<div class="pl-pr">
+    <h1>${esc(ST.coName||'Store')}</h1>
+    <div class="pl-dt">Price List — ${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})}</div>
+    <table><thead><tr>
+      <th>#</th><th>Product</th><th>Brand</th><th>Category</th>
+      <th>Unit</th>
+      <th>Purchase Rate ₹</th><th>Retail Rate ₹</th><th>Wholesale Rate ₹</th>
+    </tr></thead><tbody>${rows}</tbody></table>
+    <p style="text-align:center;font-size:11px;color:#888;margin-top:14px">Prices subject to change · ${esc(ST.coName)}</p>
+  </div>`,{size:'a4'});
+}
+
+
+
+// ════════════════════════════════════════════
+//   BRANDS
+// ════════════════════════════════════════════
+function rBrand(){
+  const prods=gP();
+  document.getElementById('brandTb').innerHTML=gBr().map(b=>`<tr>
+    <td style="font-weight:600">${esc(b.name)}</td>
+    <td><span class="badge b-bl">${prods.filter(p=>p.co===b.name).length} products</span></td>
+    <td><div style="display:flex;gap:6px">
+      <button class="btn btn-ou btn-sm" onclick="openBrandModal('${b.id}')">Edit</button>
+      <button class="btn btn-rd btn-sm" onclick="delBrand('${b.id}')">✕</button>
+    </div></td>
+  </tr>`).join('')||'<tr><td colspan="3"><div class="empty"><div class="empty-i">🏷️</div><p>No brands yet</p></div></td></tr>';
+}
+function openBrandModal(id=''){
+  document.getElementById('eBrandId').value=id;
+  document.getElementById('mBrandT').textContent=id?'Edit Brand':'Add Brand';
+  const b=id?gBr().find(x=>x.id===id):null;
+  document.getElementById('brandN').value=b?.name||'';
+  openM('mBrand');
+}
+function saveBrand(){
+  if(!vReq('brandN','Brand name is required'))return;
+  const name=document.getElementById('brandN').value.trim();
+  const brands=gBr(),eid=document.getElementById('eBrandId').value;
+  if(!eid&&brands.find(b=>b.name.toLowerCase()===name.toLowerCase())){showErr('brandN','Brand already exists');return}
+  if(eid){const i=brands.findIndex(x=>x.id===eid);if(i>-1)brands[i].name=name}
+  else brands.push({id:uid(),name});
+  sBr(brands);closeM('mBrand');rBrand();toast('Brand saved!');
+}
+function delBrand(id){
+  const prods=gP(),br=gBr().find(b=>b.id===id);
+  if(br&&prods.find(p=>p.co===br.name)){toast(`Cannot delete — ${prods.filter(p=>p.co===br.name).length} products use this brand`,'error');return}
+  if(!confirm('Delete brand?'))return;
+  sBr(gBr().filter(b=>b.id!==id));rBrand();toast('Deleted','info');
+}
+
+// ════════════════════════════════════════════
+//   UNITS OF MEASURE
+// ════════════════════════════════════════════
+function rUOM(){
+  const prods=gP();
+  document.getElementById('uomTb').innerHTML=gUOM().map(u=>`<tr>
+    <td style="font-weight:600">${esc(u.name)}</td>
+    <td class="mono" style="font-size:12px;color:var(--ink2)">${esc(u.abbr||'—')}</td>
+    <td><span class="badge b-bl">${prods.filter(p=>p.uom===u.name).length} products</span></td>
+    <td><div style="display:flex;gap:6px">
+      <button class="btn btn-ou btn-sm" onclick="openUOMModal('${u.id}')">Edit</button>
+      <button class="btn btn-rd btn-sm" onclick="delUOM('${u.id}')">✕</button>
+    </div></td>
+  </tr>`).join('')||'<tr><td colspan="4"><div class="empty"><div class="empty-i">📐</div><p>No units yet</p></div></td></tr>';
+}
+function openUOMModal(id=''){
+  document.getElementById('eUOMId').value=id;
+  document.getElementById('mUOMT').textContent=id?'Edit Unit':'Add Unit';
+  const u=id?gUOM().find(x=>x.id===id):null;
+  document.getElementById('uomN').value=u?.name||'';
+  document.getElementById('uomA').value=u?.abbr||'';
+  openM('mUOM');
+}
+function saveUOM(){
+  if(!vReq('uomN','Unit name is required'))return;
+  const name=document.getElementById('uomN').value.trim();
+  const abbr=document.getElementById('uomA').value.trim();
+  const units=gUOM(),eid=document.getElementById('eUOMId').value;
+  if(!eid&&units.find(u=>u.name.toLowerCase()===name.toLowerCase())){showErr('uomN','Unit already exists');return}
+  if(eid){const i=units.findIndex(x=>x.id===eid);if(i>-1){units[i].name=name;units[i].abbr=abbr}}
+  else units.push({id:uid(),name,abbr});
+  sUOM(units);closeM('mUOM');rUOM();toast('Unit saved!');
+}
+function delUOM(id){
+  const prods=gP(),u=gUOM().find(x=>x.id===id);
+  if(u&&prods.find(p=>p.uom===u.name)){toast(`Cannot delete — ${prods.filter(p=>p.uom===u.name).length} products use this unit`,'error');return}
+  if(!confirm('Delete unit?'))return;
+  sUOM(gUOM().filter(u=>u.id!==id));rUOM();toast('Deleted','info');
+}
+
+// ════════════════════════════════════════════
+//   CATEGORIES
+// ════════════════════════════════════════════
+function rCat(){const prods=gP();document.getElementById('catTb').innerHTML=gC().map(c=>`<tr><td style="font-weight:600">${esc(c.name)}</td><td><span class="badge b-bl">${prods.filter(p=>p.cat===c.name).length} products</span></td><td><div style="display:flex;gap:6px"><button class="btn btn-ou btn-sm" onclick="openCatModal('${c.id}')">Edit</button><button class="btn btn-rd btn-sm" onclick="delCat('${c.id}')">✕</button></div></td></tr>`).join('')||'<tr><td colspan="3"><div class="empty"><div class="empty-i">📂</div><p>No categories yet</p></div></td></tr>'}
+function openCatModal(id=''){document.getElementById('eCatId').value=id;document.getElementById('mCatT').textContent=id?'Edit Category':'Add Category';const c=id?gC().find(x=>x.id===id):null;document.getElementById('catN').value=c?.name||'';openM('mCat')}
+function saveCat(){if(!vReq('catN','Category name is required'))return;const name=document.getElementById('catN').value.trim();const cats=gC();const eid=document.getElementById('eCatId').value;if(!eid&&cats.find(c=>c.name.toLowerCase()===name.toLowerCase())){showErr('catN','Already exists');return}if(eid){const i=cats.findIndex(x=>x.id===eid);if(i>-1)cats[i].name=name}else cats.push({id:uid(),name});sC(cats);closeM('mCat');rCat();toast('Category saved!')}
+function delCat(id){const prods=gP(),cat=gC().find(c=>c.id===id);if(cat&&prods.find(p=>p.cat===cat.name)){toast(`Cannot delete — ${prods.filter(p=>p.cat===cat.name).length} products use this category`,'error');return}if(!confirm('Delete?'))return;sC(gC().filter(c=>c.id!==id));rCat();toast('Deleted','info')}
+
+
+// ════════════════════════════════════════════
+//   CSV IMPORT / EXPORT
+// ════════════════════════════════════════════
+const CSV_HEADERS=['Barcode (leave blank to auto-generate)','Product Name','Brand','Category','Unit','Purchase Rate (₹)','Retail Rate / MRP (₹)','Wholesale Rate / Trade (₹)'];
+
+function downloadTemplate(){
+  function q(v){const s=String(v||'');return s.includes(',')||s.includes('"')?'"'+s.replace(/"/g,'""')+'"':s}
+  const rows=[
+    '# Karmavati Tools & Ele — Product Import Template',
+    '# Rules: Barcode is OPTIONAL — leave blank and one will be auto-generated.',
+    '#        All other columns are required. Do not change the header row.',
+    '#        Lines starting with # are ignored during import.',
+    CSV_HEADERS.map(q).join(','),
+    // Example 1: with barcode provided
+    [q('KV0001'),'Copper Wire 2.5mm','Havells','Electrical Wire','Meter',q('45'),q('65'),q('58')].join(','),
+    // Example 2: blank barcode — will be auto-generated
+    [q(''),'LED Bulb 9W','Syska','Lighting','Piece',q('55'),q('90'),q('80')].join(','),
+    // Example 3: blank barcode
+    [q(''),'MCB 32A Single Pole','Schneider','MCB & RCCB','Piece',q('180'),q('280'),q('250')].join(','),
+  ];
+  const blob=new Blob([rows.join('\r\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='karmavati_products_template.csv';a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Template downloaded!');
+}
+
+function exportProducts(){
+  const prods=gP();
+  if(!prods.length){toast('No products to export','error');return}
+  function q(v){const s=String(v||'');return s.includes(',')||s.includes('"')||s.includes('\n')?'"'+s.replace(/"/g,'""')+'"':s}
+  const rows=[
+    '# Karmavati Tools & Ele — Product Export',
+    '# Exported: '+new Date().toLocaleString('en-IN'),
+    '# Total products: '+prods.length,
+    '# You can re-import this file. Existing barcodes will be updated, not duplicated.',
+    CSV_HEADERS.map(q).join(',')
+  ];
+  prods.forEach(p=>{
+    rows.push([q(p.bc),q(p.name),q(p.co||''),q(p.cat||''),q(p.uom||'Piece'),q(p.pp||0),q(p.rp||0),q(p.wp||0)].join(','));
+  });
+  const blob=new Blob(['\uFEFF'+rows.join('\r\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='karmavati_products_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Exported '+prods.length+' products!');
+}
+
+function uploadCSV(){
+  const file=document.getElementById('csvFile').files[0];
+  if(!file){toast('Select a CSV file first','error');return}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const text=e.target.result.replace(/^\uFEFF/,''); // strip BOM
+    // Skip comment lines (#) and blank lines
+    const lines=text.split(/\r?\n/).filter(l=>l.trim()&&!l.trim().startsWith('#'));
+    if(lines.length<2){document.getElementById('csvPreview').textContent='File is empty or has only headers.';return}
+
+    function parseCSVLine(line){
+      var result=[],cur='',inQ=false;
+      for(var i=0;i<line.length;i++){
+        var ch=line[i];
+        if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++}else inQ=!inQ}
+        else if(ch===','&&!inQ){result.push(cur.trim());cur=''}
+        else cur+=ch;
+      }
+      result.push(cur.trim());return result;
+    }
+
+    // Normalize header: strip special chars, lowercase, no spaces
+    const headers=parseCSVLine(lines[0]).map(h=>h.toLowerCase().replace(/[^a-z0-9]/g,''));
+    function fi(names){for(var n of names){var idx=headers.findIndex(h=>h.includes(n));if(idx>=0)return idx}return -1}
+
+    const idxBC =fi(['barcode','bc']);
+    const idxN  =fi(['productname','name']);
+    const idxBr =fi(['brand','company']);
+    const idxCat=fi(['category','cat']);
+    const idxU  =fi(['unit']);
+    const idxPP =fi(['purchaserate','purchasecost','pp','cost']);
+    const idxRP =fi(['retailrate','mrp','retailprice','retail']);
+    const idxWP =fi(['wholesalerate','wholesale','traderate','wp']);
+
+    if(idxN<0){
+      document.getElementById('csvPreview').innerHTML='<span style="color:var(--rd)">❌ "Product Name" column not found. Download the template and use it.</span>';
+      return;
+    }
+
+    const prods=gP();
+    // Build a set of all barcodes currently in the import batch + existing, for uniqueness
+    const usedBCs=new Set(prods.map(p=>p.bc).filter(Boolean));
+
+    function genUniqueBc(){
+      let bc, tries=0;
+      do {
+        bc='KV'+Date.now().toString().slice(-6)+Math.floor(Math.random()*9999).toString().padStart(4,'0');
+        tries++;
+      } while(usedBCs.has(bc)&&tries<1000);
+      usedBCs.add(bc);
+      return bc;
+    }
+
+    let added=0,updated=0,skipped=0;
+    for(var i=1;i<lines.length;i++){
+      const row=parseCSVLine(lines[i]);
+      if(row.every(c=>!c.trim()))continue;
+
+      const name=(idxN>=0?row[idxN]:'').trim();
+      if(!name){skipped++;continue}
+
+      // Barcode: use provided, or auto-generate unique
+      let bc=(idxBC>=0?row[idxBC]:'').trim();
+      if(!bc) bc=genUniqueBc();
+      else usedBCs.add(bc); // register provided barcode as used
+
+      const co  =(idxBr >=0?row[idxBr] :'').trim();
+      const cat =(idxCat>=0?row[idxCat]:'').trim();
+      const uom =(idxU  >=0?row[idxU]  :'').trim()||'Piece';
+      const pp  =parseFloat(idxPP>=0?row[idxPP]:0)||0;
+      const rp  =parseFloat(idxRP>=0?row[idxRP]:0)||0;
+      const wp  =parseFloat(idxWP>=0?row[idxWP]:0)||0;
+
+      const existing=prods.findIndex(p=>p.bc===bc);
+      const obj={name,bc,co,cat,uom,pp,rp,wp};
+      if(existing>=0){prods[existing]={...prods[existing],...obj};updated++}
+      else{prods.push({id:uid(),...obj});added++}
+
+      if(co) {const brands=gBr();if(!brands.find(b=>b.name===co)){brands.push({id:uid(),name:co});sBr(brands)}}
+      if(cat){const cats=gC();if(!cats.find(c=>c.name===cat)){cats.push({id:uid(),name:cat});sC(cats)}}
+      if(uom&&uom!=='Piece'){const units=gUOM();if(!units.find(u=>u.name===uom)){units.push({id:uid(),name:uom,abbr:''});sUOM(units)}}
+    }
+    sP(prods);
+    closeM('mCSV');renderProds();
+    toast('✓ '+added+' added, '+updated+' updated'+(skipped?' ('+skipped+' skipped)':''));
+    document.getElementById('csvFile').value='';
+    document.getElementById('csvPreview').textContent='';
+  };
+  reader.readAsText(file);
+}
+
+// ════════════════════════════════════════════
+//   ADMIN PANEL — TOGGLE PERMISSIONS
+// ════════════════════════════════════════════
+function rAdmin(){
+  let users=gU();
+  // Auto-recover: if no users stored, write them now
+  if(!users.length&&_cid){
+    const k='erp_co_'+_cid+'_users';
+    _ls.setItem(k,JSON.stringify([
+      {id:'usr01',u:'admin',p:'admin@123',name:'Kartik Singh',role:'admin',perms:ALL_P},
+      {id:'usr02',u:'sales1',p:'1234',name:'Ravi Sharma',role:'user',perms:['sales','pricelist']},
+      {id:'usr03',u:'purchase1',p:'1234',name:'Meera Patel',role:'user',perms:['products']},
+      {id:'usr04',u:'accountant',p:'1234',name:'Suresh Kumar',role:'user',perms:['sales','pricelist']},
+      {id:'usr05',u:'viewer',p:'1234',name:'Ankit Joshi',role:'user',perms:['pricelist']}
+    ]));
+    users=gU();
+  }
+  const tb=document.getElementById('admTb');
+  if(!tb)return;
+  if(!users.length){
+    tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="empty-i">👤</div><p>No users found</p></div></td></tr>';
+    return;
+  }
+  const rows=users.map(u=>{
+    const isSelf=u.id===ST.uid;
+    const roleB='<span class="badge '+(u.role==='admin'?'b-go':'b-bl')+'">'+esc(u.role)+'</span>';
+    let permsCell;
+    if(u.role==='admin'){
+      permsCell='<span class="badge b-gn">Full Access — All Modules</span>';
+    } else {
+      const ps=(u.perms||[]);
+      if(ps.length){
+        permsCell=ps.map(p=>'<span class="badge b-nt" style="margin:1px;font-size:10px">'+(P_ICONS[p]||'')+(P_ICONS[p]?' ':'')+p+'</span>').join('');
+      } else {
+        permsCell='<span class="badge b-rd">No Access</span>';
+      }
+    }
+    return '<tr>'
+      +'<td class="mono">'+esc(u.u)+'</td>'
+      +'<td>'+esc(u.name||'—')+'</td>'
+      +'<td>'+roleB+'</td>'
+      +'<td style="font-size:12px">'+permsCell+'</td>'
+      +'<td><div style="display:flex;gap:6px">'
+        +'<button class="btn btn-ou btn-sm" onclick="openUserModal(\''+u.id+'\')">Edit</button>'
+        +(isSelf?'':'<button class="btn btn-rd btn-sm" onclick="delUser(\''+u.id+'\')">✕</button>')
+      +'</div></td>'
+    +'</tr>';
+  });
+  tb.innerHTML=rows.join('');
+}
+
+function reloadDemoUsers(){
+  if(!_cid){toast('Not logged in','error');return}
+  const prefix='erp_co_'+_cid+'_';
+  const uKey=prefix+'users';
+  _ls.setItem(uKey,JSON.stringify([
+    {id:'usr01',u:'admin',p:'admin@123',name:'Kartik Singh',role:'admin',perms:ALL_P},
+    {id:'usr02',u:'sales1',p:'1234',name:'Ravi Sharma',role:'user',perms:['sales','pricelist']},
+    {id:'usr03',u:'purchase1',p:'1234',name:'Meera Patel',role:'user',perms:['products']},
+    {id:'usr04',u:'accountant',p:'1234',name:'Suresh Kumar',role:'user',perms:['sales','pricelist']},
+    {id:'usr05',u:'viewer',p:'1234',name:'Ankit Joshi',role:'user',perms:['pricelist']}
+  ]));
+  rAdmin();toast('Users reloaded!');
+}
+
+function openUserModal(id=''){
+  // Clear all errors
+  ['uUsr','uPw','uNm'].forEach(i=>clearErr(i));
+  document.getElementById('eUId').value=id;
+  document.getElementById('mUserT').textContent=id?'Edit User':'Add User';
+
+  // Try to find user — if id given but not found, show error
+  let u=null;
+  if(id){
+    u=gU().find(x=>x.id===id);
+    if(!u){
+      // Try reloading users and search again
+      rAdmin();// This auto-reloads users if empty
+      u=gU().find(x=>x.id===id);
+    }
+  }
+
+  document.getElementById('uNm').value=u?.name||'';
+  document.getElementById('uUsr').value=u?.u||'';
+  document.getElementById('uPw').value='';
+  document.getElementById('uRole').value=u?.role||'user';
+
+  // Always build permission table — show all perms for admin, selected for user
+  const permsToShow=u?.role==='admin'?ALL_P:(u?.perms||[]);
+  buildPermTable(permsToShow);
+  onRoleChange();
+  openM('mUser');
+}
+
+function buildPermTable(selected=[]){
+  document.getElementById('permTbl').innerHTML=`
+    <thead><tr><th style="width:40px">Icon</th><th>Feature</th><th>Description</th><th style="width:80px;text-align:center">Access</th></tr></thead>
+    <tbody>${ALL_P.map(p=>`<tr>
+      <td style="font-size:18px;text-align:center">${P_ICONS[p]||'·'}</td>
+      <td><div class="perm-name">${p.charAt(0).toUpperCase()+p.slice(1)}</div></td>
+      <td><div class="perm-desc">${P_DESC[p]||''}</div></td>
+      <td style="text-align:center">
+        <label class="tog-sw"><input type="checkbox" data-perm="${p}" ${selected.includes(p)?'checked':''}><span class="tog-sl"></span></label>
+      </td>
+    </tr>`).join('')}</tbody>`;
+}
+
+function onRoleChange(){
+  const role=document.getElementById('uRole').value;
+  const ps=document.getElementById('permSec');
+  if(!ps)return;
+  if(role==='admin'){
+    // Show permission section but with all-checked note
+    ps.style.display='block';
+    // Check all toggles
+    document.querySelectorAll('#permTbl input[type=checkbox]').forEach(cb=>{cb.checked=true;cb.disabled=true});
+    // Show a note
+    let note=document.getElementById('adminPermNote');
+    if(!note){
+      note=document.createElement('div');
+      note.id='adminPermNote';
+      note.style.cssText='font-size:12.5px;color:var(--gn);background:var(--gnd);border:1px solid var(--gnb);border-radius:var(--r);padding:9px 14px;margin-bottom:12px;font-weight:600';
+      note.textContent='✓ Admin role has full access to all modules. Toggles are locked.';
+      ps.insertBefore(note,ps.firstChild);
+    }
+    note.style.display='block';
+  } else {
+    ps.style.display='block';
+    document.querySelectorAll('#permTbl input[type=checkbox]').forEach(cb=>cb.disabled=false);
+    const note=document.getElementById('adminPermNote');
+    if(note)note.style.display='none';
+  }
+}
+
+function saveUser(){
+  if(!vReq('uUsr','Username required'))return;
+  const users=gU();const eid=document.getElementById('eUId').value;
+  const uname=document.getElementById('uUsr').value.trim();const pw=document.getElementById('uPw').value;const role=document.getElementById('uRole').value;
+  if(!eid&&!pw){showErr('uPw','Password required for new user');return}
+  if(!eid&&users.find(u=>u.u===uname)){showErr('uUsr','Username already taken');return}
+  const perms=[...document.querySelectorAll('#permTbl input[type=checkbox]:checked')].map(cb=>cb.dataset.perm).filter(Boolean);
+  if(eid){const i=users.findIndex(x=>x.id===eid);if(i>-1){users[i].name=document.getElementById('uNm').value.trim();users[i].u=uname;users[i].role=role;users[i].perms=perms;if(pw)users[i].p=pw}}
+  else users.push({id:uid(),name:document.getElementById('uNm').value.trim(),u:uname,p:pw,role,perms});
+  sU(users);closeM('mUser');rAdmin();toast('User saved!');
+}
+function delUser(id){if(id===ST.uid){toast("Cannot delete your own account",'error');return}if(!confirm('Delete user?'))return;sU(gU().filter(u=>u.id!==id));rAdmin();toast('Deleted','info')}
+
+// ════════════════════════════════════════════
+//   SUPER ADMIN
+// ════════════════════════════════════════════
+// ════════════════════════════════════════════
+//   SUPER ADMIN — FULLY FUNCTIONAL
+// ════════════════════════════════════════════
+
+// Store company list globally so buttons can reference by index (avoids all quote escaping)
+let _SA_COS = [];
+
+function renderSA(){
+  _SA_COS = getCos();
+  renderSAStats();
+  renderSAOverview();
+  renderSACos();
+  renderSAUFilter();
+  renderSAUsers();
+}
+
+// ── Stats row ──
+function renderSAStats(){
+  const cos = getCos();
+  let tu=0, tp=0, ts=0, trev=0;
+  cos.forEach(function(co){
+    tu += DB.get('co_'+co.id+'_users',[]).length;
+    tp += DB.get('co_'+co.id+'_prods',[]).length;
+    var sal = DB.get('co_'+co.id+'_sales',[]);
+    ts += sal.length;
+    trev += sal.reduce(function(a,s){return a+(s.grand||0)},0);
+  });
+  var el = document.getElementById('saStatsRow');
+  if(!el) return;
+  el.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px">' +
+      '<div class="sc"><div class="sl">Companies</div><div class="sv c-go">'+cos.length+'</div><div class="sc-ch">registered</div></div>' +
+      '<div class="sc"><div class="sl">Total Users</div><div class="sv c-bl">'+tu+'</div><div class="sc-ch">across all</div></div>' +
+      '<div class="sc"><div class="sl">Total Products</div><div class="sv">'+tp+'</div><div class="sc-ch">in catalogs</div></div>' +
+      '<div class="sc"><div class="sl">Total Sales</div><div class="sv c-gn">'+ts+'</div><div class="sc-ch">transactions</div></div>' +
+      '<div class="sc"><div class="sl">Total Revenue</div><div class="sv c-gn" style="font-size:20px">'+fM(trev)+'</div><div class="sc-ch">combined</div></div>' +
+    '</div>';
+}
+
+// ── Overview panel ──
+function renderSAOverview(){
+  var cos = getCos();
+  var gl = document.getElementById('saGlance');
+  if(!gl) return;
+  if(!cos.length){
+    gl.innerHTML = '<div style="color:var(--ink3);font-size:13px;padding:24px 0;text-align:center">No companies yet.<br><button class="btn btn-dk" onclick="saPage(\'companies\');saShowAddForm()" style="margin-top:12px">+ Create First Company</button></div>';
+    return;
+  }
+  gl.innerHTML = cos.map(function(co){
+    var u = DB.get('co_'+co.id+'_users',[]).length;
+    var p = DB.get('co_'+co.id+'_prods',[]).length;
+    var s = DB.get('co_'+co.id+'_sales',[]);
+    var r = s.reduce(function(a,x){return a+(x.grand||0)},0);
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--bord2)">' +
+      '<div><div style="font-size:13.5px;font-weight:600">'+esc(co.name)+'</div>' +
+      '<div style="font-size:11.5px;color:var(--ink3);margin-top:2px">'+u+' users · '+p+' products · '+s.length+' sales</div></div>' +
+      '<div style="display:flex;align-items:center;gap:8px">' +
+        '<span style="font-family:var(--fm);font-size:12.5px;color:var(--gn);font-weight:600">'+fM(r)+'</span>' +
+        '<span class="badge '+(co.paused?'b-rd':'b-gn')+'">'+(co.paused?'Paused':'Active')+'</span>' +
+      '</div></div>';
+  }).join('');
+}
+
+// ── Companies table ──
+// Uses index-based onclick: saCoBtn(idx, 'action') to avoid all quote escaping issues
+function renderSACos(){
+  _SA_COS = getCos();
+  var tb = document.getElementById('coTb');
+  if(!tb) return;
+  if(!_SA_COS.length){
+    tb.innerHTML = '<tr><td colspan="8"><div class="empty" style="padding:48px 20px">' +
+      '<div class="empty-i">🏢</div><p style="font-size:14px;margin-bottom:16px">No companies registered yet</p>' +
+      '<button class="btn btn-dk" onclick="saShowAddForm()">+ Add First Company</button>' +
+      '</div></td></tr>';
+    return;
+  }
+  tb.innerHTML = _SA_COS.map(function(co, i){
+    var users = DB.get('co_'+co.id+'_users',[]);
+    var adm   = users.find(function(u){return u.role==='admin'});
+    var prods = DB.get('co_'+co.id+'_prods',[]).length;
+    var sales = DB.get('co_'+co.id+'_sales',[]);
+    var rev   = sales.reduce(function(a,s){return a+(s.grand||0)},0);
+    var paused = co.paused===true;
+    return '<tr>' +
+      '<td><div style="font-weight:600">'+esc(co.name)+'</div><div style="font-size:11px;color:var(--ink3)">'+co.id+'</div></td>' +
+      '<td class="mono" style="font-size:12px">'+(adm?esc(adm.u):'—')+'</td>' +
+      '<td><span class="badge b-bl">'+users.length+'</span></td>' +
+      '<td><span class="badge b-go">'+prods+'</span></td>' +
+      '<td><span class="badge b-gn">'+sales.length+'</span></td>' +
+      '<td style="font-family:var(--fm);color:var(--gn)">'+fM(rev)+'</td>' +
+      '<td><span class="badge '+(paused?'b-rd':'b-gn')+'">'+(paused?'Paused':'Active')+'</span></td>' +
+      '<td><div style="display:flex;gap:4px;flex-wrap:wrap">' +
+        '<button class="btn btn-pu btn-xs"  onclick="saCoBtn('+i+',\'login\')">🔑 Login As</button>' +
+        '<button class="btn btn-ou btn-xs"  onclick="saCoBtn('+i+',\'edit\')">✎ Edit</button>' +
+        '<button class="btn btn-xs '+(paused?'btn-gn':'btn-ou')+'" onclick="saCoBtn('+i+',\'pause\')">'+(paused?'▶ Resume':'⏸ Pause')+'</button>' +
+        '<button class="btn btn-rd btn-xs"  onclick="saCoBtn('+i+',\'delete\')">🗑 Delete</button>' +
+      '</div></td>' +
+    '</tr>';
+  }).join('');
+}
+
+// Single dispatcher for all company row buttons
+function saCoBtn(idx, action){
+  var co = _SA_COS[idx];
+  if(!co){ toast('Error: refresh the page','error'); renderSACos(); return; }
+  if(action==='login')  loginAsCo(co.id);
+  if(action==='edit')   saShowEditForm(co.id);
+  if(action==='pause')  togglePauseCo(co.id);
+  if(action==='delete') delCo(co.id);
+}
+
+// ── Inline Add/Edit Form (no modal) ──
+function saShowAddForm(){
+  saPage('companies');
+  var f=document.getElementById('saCoForm');
+  var t=document.getElementById('saCoFormTitle');
+  var i=document.getElementById('saCoFormId');
+  var n=document.getElementById('saCoFormName');
+  var u=document.getElementById('saCoFormUser');
+  var p=document.getElementById('saCoFormPass');
+  var e=document.getElementById('saCoFormErr');
+  if(!f)return;
+  if(t) t.textContent='Add New Company';
+  if(i) i.value='';
+  if(n) n.value='';
+  if(u){ u.value=''; u.readOnly=false; u.style.opacity='1'; }
+  if(p) p.value='';
+  if(e){ e.style.display='none'; e.textContent=''; }
+  f.style.display='block';
+  if(n) n.focus();
+}
+
+function saShowEditForm(coId){
+  saPage('companies');
+  var co  = getCos().find(function(c){return c.id===coId});
+  var adm = DB.get('co_'+coId+'_users',[]).find(function(u){return u.role==='admin'});
+  var f=document.getElementById('saCoForm');
+  var t=document.getElementById('saCoFormTitle');
+  var i=document.getElementById('saCoFormId');
+  var n=document.getElementById('saCoFormName');
+  var u=document.getElementById('saCoFormUser');
+  var p=document.getElementById('saCoFormPass');
+  var e=document.getElementById('saCoFormErr');
+  if(!f)return;
+  if(t) t.textContent='Edit Company';
+  if(i) i.value=coId;
+  if(n) n.value=co?co.name:'';
+  if(u){ u.value=adm?adm.u:''; u.readOnly=true; u.style.opacity='0.6'; }
+  if(p){ p.value=''; p.placeholder='Leave blank to keep current password'; }
+  if(e){ e.style.display='none'; e.textContent=''; }
+  f.style.display='block';
+  if(n) n.focus();
+}
+
+function saFormCancel(){
+  var f=document.getElementById('saCoForm');
+  if(f) f.style.display='none';
+}
+
+function saFormSave(){
+  var eid  = (document.getElementById('saCoFormId')||{}).value||'';
+  var name = ((document.getElementById('saCoFormName')||{}).value||'').trim();
+  var admU = ((document.getElementById('saCoFormUser')||{}).value||'').trim();
+  var admP = (document.getElementById('saCoFormPass')||{}).value||'';
+  var errEl= document.getElementById('saCoFormErr');
+
+  function showErr(msg){
+    if(errEl){ errEl.textContent=msg; errEl.style.display='block'; }
+    else toast(msg,'error');
+  }
+
+  if(!name){ showErr('Company name is required.'); return; }
+
+  var cos = getCos();
+
+  if(eid){
+    // Edit
+    var i=cos.findIndex(function(c){return c.id===eid});
+    if(i>-1) cos[i].name=name;
+    if(admP){
+      if(admP.length<4){ showErr('Password must be at least 4 characters.'); return; }
+      var users=DB.get('co_'+eid+'_users',[]);
+      var ai=users.findIndex(function(u){return u.role==='admin'});
+      if(ai>-1){ users[ai].p=admP; DB.set('co_'+eid+'_users',users); }
+    }
+    setCos(cos);
+    saFormCancel();
+    renderSA();
+    toast('Company updated!');
+  } else {
+    // Create
+    if(!admU){ showErr('Admin username is required.'); return; }
+    if(!admP){ showErr('Admin password is required.'); return; }
+    if(admP.length<4){ showErr('Password must be at least 4 characters.'); return; }
+    var coId=uid();
+    cos.push({id:coId,name:name,active:true,paused:false,createdAt:Date.now()});
+    DB.set('co_'+coId+'_users',[{id:uid(),u:admU,p:admP,name:'Admin',role:'admin',perms:ALL_P}]);
+    DB.set('co_'+coId+'_cats',[
+      {id:uid(),name:'General'},{id:uid(),name:'Electronics'},
+      {id:uid(),name:'Hardware'},{id:uid(),name:'Electrical'},
+      {id:uid(),name:'Lighting'},{id:uid(),name:'Tools'}
+    ]);
+    DB.set('co_'+coId+'_uoms',[
+      {id:uid(),name:'Piece',abbr:'Pcs',type:'Quantity'},
+      {id:uid(),name:'Box',abbr:'Box',type:'Pack'},
+      {id:uid(),name:'Meter',abbr:'Mtr',type:'Length'},
+      {id:uid(),name:'Kilogram',abbr:'Kg',type:'Weight'},
+      {id:uid(),name:'Dozen',abbr:'Dz',type:'Pack'},
+      {id:uid(),name:'Coil',abbr:'Coil',type:'Pack'},
+      {id:uid(),name:'Bundle',abbr:'Bndl',type:'Pack'},
+      {id:uid(),name:'Roll',abbr:'Rll',type:'Pack'},
+      {id:uid(),name:'Set',abbr:'Set',type:'Quantity'},
+      {id:uid(),name:'Liter',abbr:'Ltr',type:'Volume'}
+    ]);
+    setCos(cos);
+    saFormCancel();
+    renderSA();
+    toast('Company "'+name+'" created! Login: '+admU+' / '+admP);
+  }
+}
+
+// ── SA Tab navigation ──
+function saPage(name){
+  document.querySelectorAll('.sa-ni').forEach(function(b){b.classList.remove('on')});
+  document.querySelectorAll('.sa-pg').forEach(function(p){p.classList.remove('on')});
+  var btn = document.getElementById('sani-'+name);
+  var pg  = document.getElementById('sapg-'+name);
+  if(btn) btn.classList.add('on');
+  if(pg)  pg.classList.add('on');
+  if(name==='overview')  { renderSAStats(); renderSAOverview(); }
+  if(name==='companies') { renderSACos(); }
+  if(name==='users')     { renderSAUFilter(); renderSAUsers(); }
+  if(name==='settings')  {
+    try {
+      var n = Object.keys(localStorage).filter(function(k){return k.startsWith('erp_')}).length;
+      var si = document.getElementById('saStorageInfo');
+      if(si) si.textContent = 'Storage keys in use: ' + n;
+    } catch(e){}
+  }
+}
+
+// ── All Users panel ──
+function renderSAUFilter(){
+  var cos = getCos();
+  var sel = document.getElementById('saUF');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">All Companies ('+cos.length+')</option>' +
+    cos.map(function(co){ return '<option value="'+co.id+'">'+esc(co.name)+'</option>'; }).join('');
+}
+
+function renderSAUsers(){
+  var cos  = getCos();
+  var filt = (document.getElementById('saUF')||{}).value || '';
+  var tb   = document.getElementById('saUTb');
+  if(!tb) return;
+  var rows = '';
+  cos.forEach(function(co){
+    if(filt && co.id !== filt) return;
+    var users = DB.get('co_'+co.id+'_users',[]);
+    if(!users.length){
+      rows += '<tr><td colspan="6" style="color:var(--ink3);font-size:12px;padding:10px 14px">'+esc(co.name)+' — no users yet</td></tr>';
+      return;
+    }
+    users.forEach(function(u){
+      var permsText = u.role==='admin' ? '<span class="badge b-gn">Full Access</span>' :
+        ((u.perms||[]).length ? (u.perms||[]).join(', ') : '<span class="badge b-rd">None</span>');
+      rows +=
+        '<tr>' +
+          '<td class="mono">'+esc(u.u)+'</td>' +
+          '<td>'+esc(u.name||'—')+'</td>' +
+          '<td><span class="badge b-go">'+esc(co.name)+'</span></td>' +
+          '<td><span class="badge '+(u.role==='admin'?'b-go':'b-bl')+'">'+esc(u.role)+'</span></td>' +
+          '<td style="font-size:11.5px">'+permsText+'</td>' +
+      '<td><button class="btn btn-ou btn-sm" onclick="saResetPw(\''+co.id+'\',\''+u.id+'\')">🔑 Reset PW</button></td>' +
+        '</tr>';
+    });
+  });
+  tb.innerHTML = rows || '<tr><td colspan="6"><div class="empty"><p>No users found</p></div></td></tr>';
+}
+
+// ── Login As Company ──
+function loginAsCo(coId){
+  var cos = getCos();
+  var co  = cos.find(function(c){return c.id===coId});
+  if(!co){ toast('Company not found','error'); return; }
+  if(co.paused){ toast('Company is paused. Resume it first.','error'); return; }
+  var users = DB.get('co_'+coId+'_users',[]);
+  var adm   = users.find(function(u){return u.role==='admin'});
+  if(!adm){
+    var pw = prompt('No admin user exists for "'+co.name+'".\nEnter a password to create one now:');
+    if(!pw || pw.length < 4){ toast('Password too short (min 4 chars)','error'); return; }
+    var newAdm = {id:uid(), u:'admin', p:pw, name:'Admin', role:'admin', perms:ALL_P};
+    users.push(newAdm);
+    DB.set('co_'+coId+'_users', users);
+    adm = newAdm;
+    toast('Admin user created!','info');
+  }
+  _cid = coId;
+  Object.assign(ST, {
+    role:'admin', cid:coId, uid:adm.id, u:adm.u,
+    name:adm.name||adm.u, perms:ALL_P, coName:co.name, impersonating:true
+  });
+  document.getElementById('scrApp').style.display = 'block';
+  if(ban){
+    ban.style.display = 'flex';
+    var nm = document.getElementById('impCoName');
+    if(nm) nm.textContent = co.name;
+  }
+  var sb = document.querySelector('.sidebar');
+  var mn = document.querySelector('.main');
+  if(sb) sb.style.top = '40px';
+  if(mn) mn.style.paddingTop = '66px';
+  initApp();
+  toast('Viewing as: '+co.name,'info');
+}
+
+function returnToSA(){
+  ST.impersonating = false; _cid = null;
+  document.getElementById('scrApp').style.display = 'none';
+  if(ban) ban.style.display = 'none';
+  var sb = document.querySelector('.sidebar');
+  var mn = document.querySelector('.main');
+  if(sb) sb.style.top = '0';
+  if(mn) mn.style.paddingTop = '26px';
+  renderSA();
+}
+
+// ── Pause / Resume ──
+function togglePauseCo(id){
+  var cos = getCos();
+  var i   = cos.findIndex(function(c){return c.id===id});
+  if(i===-1){ toast('Company not found','error'); return; }
+  cos[i].paused = !cos[i].paused;
+  setCos(cos);
+  _SA_COS = cos;
+  toast(cos[i].paused ? 'Company paused — users cannot login' : 'Company is now active','info');
+  renderSA();
+}
+
+// ── Add / Edit Company ──
+function openCoModal(id){
+  id = id || '';
+  // Clear fields
+  var fields = ['coNm','coAdmU','coAdmP'];
+  fields.forEach(function(f){
+    clearErr(f);
+    var el = document.getElementById(f);
+    if(el){ el.value=''; el.readOnly=false; el.style.color=''; }
+  });
+  document.getElementById('eCoId').value = id;
+  var titleEl = document.getElementById('mCoT');
+  if(titleEl) titleEl.textContent = id ? 'Edit Company' : 'Add New Company';
+  var hintEl = document.getElementById('coAdmPHint');
+  if(id){
+    var co  = getCos().find(function(x){return x.id===id});
+    var adm = DB.get('co_'+id+'_users',[]).find(function(u){return u.role==='admin'});
+    if(co){  var nm=document.getElementById('coNm'); if(nm) nm.value=co.name; }
+    if(adm){ var au=document.getElementById('coAdmU'); if(au){ au.value=adm.u; au.readOnly=true; au.style.color='var(--ink3)'; }}
+    if(hintEl) hintEl.textContent = 'Leave blank to keep current admin password';
+  } else {
+    if(hintEl) hintEl.textContent = '';
+  }
+  openM('mCo');
+}
+
+function saveCo(){
+  if(!vReq('coNm','Company name is required')) return;
+  var cos  = getCos();
+  var eid  = document.getElementById('eCoId').value;
+  var name = document.getElementById('coNm').value.trim();
+  var admU = (document.getElementById('coAdmU').value||'').trim();
+  var admP = document.getElementById('coAdmP').value||'';
+
+  if(eid){
+    // Edit mode
+    var i = cos.findIndex(function(x){return x.id===eid});
+    if(i>-1) cos[i].name = name;
+    if(admP){
+      var users = DB.get('co_'+eid+'_users',[]);
+      var ai    = users.findIndex(function(u){return u.role==='admin'});
+      if(ai>-1){ users[ai].p = admP; DB.set('co_'+eid+'_users', users); }
+    }
+    setCos(cos);
+    closeM('mCo');
+    renderSA();
+    toast('Company updated!');
+  } else {
+    // Create mode
+    if(!admU){ showErr('coAdmU','Admin username is required'); return; }
+    if(!admP){ showErr('coAdmP','Admin password is required'); return; }
+    if(admP.length < 4){ showErr('coAdmP','Password must be at least 4 characters'); return; }
+    var coId = uid();
+    cos.push({id:coId, name:name, active:true, paused:false, createdAt:Date.now()});
+    DB.set('co_'+coId+'_users', [{id:uid(), u:admU, p:admP, name:'Admin', role:'admin', perms:ALL_P}]);
+    DB.set('co_'+coId+'_cats', [
+      {id:uid(),name:'General'},{id:uid(),name:'Electronics'},{id:uid(),name:'Hardware'},
+      {id:uid(),name:'Electrical'},{id:uid(),name:'Lighting'},{id:uid(),name:'Tools'}
+    ]);
+    DB.set('co_'+coId+'_uoms', [
+      {id:uid(),name:'Piece',abbr:'Pcs',type:'Quantity'},{id:uid(),name:'Box',abbr:'Box',type:'Pack'},
+      {id:uid(),name:'Dozen',abbr:'Dz',type:'Pack'},{id:uid(),name:'Meter',abbr:'Mtr',type:'Length'},
+      {id:uid(),name:'Kilogram',abbr:'Kg',type:'Weight'},{id:uid(),name:'Liter',abbr:'Ltr',type:'Volume'},
+      {id:uid(),name:'Roll',abbr:'Rll',type:'Pack'},{id:uid(),name:'Bundle',abbr:'Bndl',type:'Pack'},
+      {id:uid(),name:'Set',abbr:'Set',type:'Quantity'},{id:uid(),name:'Coil',abbr:'Coil',type:'Pack'}
+    ]);
+    setCos(cos);
+    closeM('mCo');
+    renderSA();
+    toast('Company "'+name+'" created! Login: '+admU+' / '+admP);
+  }
+}
+
+// ── Delete Company ──
+function delCo(id){
+  var co = getCos().find(function(c){return c.id===id});
+  if(!co) return;
+  if(!confirm('Delete "'+co.name+'"?\n\nThis permanently removes all products, sales, users and data. Cannot be undone.')) return;
+  setCos(getCos().filter(function(c){return c.id!==id}));
+  ['prods','purs','sales','sups','cats','users','uoms'].forEach(function(k){
+    DB.del('co_'+id+'_'+k);
+  });
+  _SA_COS = getCos();
+  renderSA();
+  toast('"'+co.name+'" deleted','info');
+}
+
+// ── Reset User Password ──
+function openRstFor(coId, uId){
+  var e1=document.getElementById('rstCo'), e2=document.getElementById('rstU'), e3=document.getElementById('rstPw');
+  if(e1) e1.value = coId;
+  if(e2) e2.value = uId;
+  if(e3) e3.value = '';
+  clearErr('rstPw');
+  var co = getCos().find(function(c){return c.id===coId});
+  var u  = DB.get('co_'+coId+'_users',[]).find(function(x){return x.id===uId});
+  var t  = document.getElementById('mRstT');
+  if(t) t.textContent = 'Reset: ' + (u?esc(u.u):'user') + ' @ ' + (co?esc(co.name):'');
+  openM('mRst');
+}
+// Keep backward-compat alias
+function openRst(coId,uId){ openRstFor(coId,uId); }
+
+// Simple prompt-based password reset (avoids modal issues)
+function saResetPw(coId, uId){
+  var co    = getCos().find(function(c){return c.id===coId});
+  var users = DB.get('co_'+coId+'_users',[]);
+  var u     = users.find(function(x){return x.id===uId});
+  var msg   = 'Reset password for "' + (u?u.u:'user') + '" @ ' + (co?co.name:'') + '\n\nEnter new password (min 4 chars):';
+  var pw    = prompt(msg);
+  if(pw===null) return;
+  if(!pw || pw.length<4){ toast('Password too short (min 4 chars)','error'); return; }
+  var i = users.findIndex(function(x){return x.id===uId});
+  if(i>-1){
+    users[i].p = pw;
+    DB.set('co_'+coId+'_users', users);
+    toast('Password reset for ' + (u?u.u:'user') + '!');
+  }
+}
+
+function doRst(){
+  var pw   = (document.getElementById('rstPw')||{}).value || '';
+  var coId = (document.getElementById('rstCo')||{}).value || '';
+  var uId  = (document.getElementById('rstU')||{}).value  || '';
+  if(pw.length < 4){ showErr('rstPw','Minimum 4 characters'); return; }
+  var users = DB.get('co_'+coId+'_users',[]);
+  var i     = users.findIndex(function(u){return u.id===uId});
+  if(i>-1){
+    users[i].p = pw;
+    DB.set('co_'+coId+'_users', users);
+    closeM('mRst');
+    renderSAUsers();
+    toast('Password reset successfully!');
+  } else {
+    toast('User not found','error');
+  }
+}
+
+// ── Change SA Password ──
+function changeSAPw(){
+  var old = (document.getElementById('saOld')||{}).value || '';
+  var nw  = (document.getElementById('saNew')||{}).value || '';
+  var cn  = (document.getElementById('saCon')||{}).value || '';
+  var sa  = getSA();
+  if(old !== sa.p){ toast('Current password is incorrect','error'); return; }
+  if(nw.length < 4){ toast('New password must be at least 4 characters','error'); return; }
+  if(nw !== cn){ toast('Passwords do not match','error'); return; }
+  setSA(Object.assign({},sa,{p:nw}));
+  ['saOld','saNew','saCon'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  toast('Super admin password updated!');
+}
+
+
+// ════════════════════════════════════════════
+//   PRINT ENGINE
+// ════════════════════════════════════════════
+// doPrint — size: 'a4' | 'a5' | 'custom' (custom = html contains its own @page style)
+function doPrint(html, opts){
+  opts = opts || {};
+  const hasBc = opts.bc || false;
+  const size  = opts.size || 'a4';
+  const area  = document.getElementById('printArea');
+  // Inject page-size override style (skip for 'custom' — label HTML has its own)
+  const styleId = 'printPageStyle';
+  let st = document.getElementById(styleId);
+  if(!st){ st=document.createElement('style'); st.id=styleId; document.head.appendChild(st); }
+  if(size==='a5'){
+    st.textContent = '@media print{@page{size:A5 portrait;margin:8mm}}';
+  } else if(size==='a4'){
+    st.textContent = '@media print{@page{size:A4 portrait;margin:10mm}}';
+  } else {
+    st.textContent = ''; // custom — label HTML sets its own @page
+  }
+  area.innerHTML = html;
+  area.style.display = 'block';
+  if(hasBc){
+    area.querySelectorAll('.bcp').forEach(svg=>{
+      const h = parseFloat(svg.dataset.h)||48;
+      const w = parseFloat(svg.dataset.w)||2;
+      try{JsBarcode(svg, svg.dataset.v, {
+        format:'CODE128', width:w, height:h,
+        displayValue:true, fontSize:9, margin:2,
+        background:'#fff', lineColor:'#000'
+      })}catch{}
+    });
+  }
+  setTimeout(()=>{ window.print(); area.style.display='none'; area.innerHTML=''; }, 600);
+}
+
+function printRcp(sale){
+  const all=gS();
+  const num=String((all.findIndex(s=>s.id===sale.id)+1)||all.length).padStart(4,'0');
+  const rows=(sale.items||[]).map(it=>
+    `<tr><td>${esc(it.name)}</td><td style="text-align:center">${it.qty}</td>`+
+    `<td class="tr">₹${parseFloat(it.prc||0).toFixed(2)}</td>`+
+    `<td class="tr">${(it.disc||0)>0?'-₹'+parseFloat(it.disc).toFixed(2):'—'}</td>`+
+    `<td class="tr">₹${parseFloat(it.tot||0).toFixed(2)}</td></tr>`
+  ).join('');
+  const sc = sale.status==='paid' ? 'stamp-paid' : 'stamp-unpaid';
+  const html =
+    `<div class="rcp-wrap">` +
+      `<div class="rcp-hd">` +
+        `<div class="rcp-shop">${esc(ST.coName||'Store')}</div>` +
+        `<div class="rcp-addr">Tax Invoice</div>` +
+      `</div>` +
+      `<div class="rcp-m"><span>Invoice #${num}</span><span>${fD(sale.date)}</span></div>` +
+      `<div class="rcp-m"><span>Customer</span><strong>${esc(sale.cust||'Guest')}</strong></div>` +
+      `<table class="rcp-tbl"><thead><tr>` +
+        `<th>Item</th><th style="text-align:center">Qty</th>` +
+        `<th class="tr">Rate</th><th class="tr">Disc</th><th class="tr">Amt</th>` +
+      `</tr></thead><tbody>${rows}</tbody></table>` +
+      `<div class="rcp-tot">` +
+        `<div class="rcp-tot-r"><span>Subtotal</span><span>₹${parseFloat(sale.subtotal||0).toFixed(2)}</span></div>` +
+        ((sale.disc||0)>0 ? `<div class="rcp-tot-r"><span>Discount</span><span>-₹${parseFloat(sale.disc).toFixed(2)}</span></div>` : '') +
+        `<div class="rcp-tot-r rcp-grd"><span>TOTAL</span><span>₹${parseFloat(sale.grand||0).toFixed(2)}</span></div>` +
+        `<div class="rcp-tot-r" style="margin-top:6px"><span>Payment</span><span><strong>${(sale.status||'unpaid').toUpperCase()}</strong></span></div>` +
+      `</div>` +
+      `<div class="stamp ${sc}">${sale.status==='paid'?'PAID':'UNPAID'}</div>` +
+      `<div class="rcp-ft">Thank you for your business!<br>${esc(ST.coName||'Store')}</div>` +
+    `</div>`;
+  doPrint(html, {size:'a5'});
+}
+
+
+
+// ════════════════════════════════════════════
+//   FILE PERSISTENCE — saves all data to a
+//   JSON file on disk; auto-restores on open
+// ════════════════════════════════════════════
+const FP = {
+  _handle: null,      // FileSystemFileHandle
+  _idb: null,         // IndexedDB instance
+  _dirty: false,
+  _timer: null,
+  _hasAPI: typeof window !== 'undefined' && 'showSaveFilePicker' in window,
+
+  // ── IndexedDB: persist the file handle across sessions ──
+  async initIDB() {
+    return new Promise(res => {
+      try {
+        const req = indexedDB.open('kv_erp_fp', 1);
+        req.onupgradeneeded = e => e.target.result.createObjectStore('h');
+        req.onsuccess = e => { this._idb = e.target.result; res(); };
+        req.onerror = () => res();
+      } catch(e){ res(); }
+    });
+  },
+
+  async _idbGet(key) {
+    if (!this._idb) return null;
+    return new Promise(res => {
+      try {
+        const tx = this._idb.transaction('h','readonly');
+        const r = tx.objectStore('h').get(key);
+        r.onsuccess = () => res(r.result ?? null);
+        r.onerror   = () => res(null);
+      } catch(e){ res(null); }
+    });
+  },
+
+  async _idbSet(key, val) {
+    if (!this._idb) return;
+    return new Promise(res => {
+      try {
+        const tx = this._idb.transaction('h','readwrite');
+        tx.objectStore('h').put(val, key);
+        tx.oncomplete = () => res();
+        tx.onerror    = () => res();
+      } catch(e){ res(); }
+    });
+  },
+
+  // ── Snapshot: collect all erp_ keys from localStorage ──
+  _snapshot() {
+    const out = {};
+    try {
+      _ls.keys().filter(k => k.startsWith('erp_')).forEach(k => {
+        out[k] = _ls.getItem(k);
+      });
+    } catch(e){}
+    return out;
+  },
+
+  // ── Write snapshot to the chosen file ──
+  async _write() {
+    if (!this._handle) return;
+    try {
+      const w = await this._handle.createWritable();
+      await w.write(JSON.stringify(this._snapshot(), null, 2));
+      await w.close();
+      this._dirty = false;
+      this._updateUI();
+    } catch(e) {
+      // permission may have been revoked
+      this._handle = null;
+      this._updateUI();
+    }
+  },
+
+  // ── Debounced write (batches rapid changes) ──
+  scheduleWrite() {
+    if (!this._handle) return;
+    this._dirty = true;
+    clearTimeout(this._timer);
+    this._timer = setTimeout(() => this._write(), 800);
+  },
+
+  // ── Read data file and restore into localStorage ──
+  async _readAndRestore(handle) {
+    try {
+      const file = await handle.getFile();
+      const text = await file.text();
+      const data = JSON.parse(text);
+      let count = 0;
+      Object.entries(data).forEach(([k, v]) => {
+        if (k.startsWith('erp_')) { _ls.setItem(k, v); count++; }
+      });
+      return count;
+    } catch(e) { return 0; }
+  },
+
+  // ── On app start: try to reconnect to the previously used file ──
+  async tryRestore() {
+    await this.initIDB();
+    if (!this._hasAPI) { this._updateUI(); return; }
+    try {
+      const handle = await this._idbGet('dataFile');
+      if (!handle) { this._updateUI(); return; }
+      // Check / request permission
+      let perm = await handle.queryPermission({ mode:'readwrite' });
+      if (perm !== 'granted') {
+        perm = await handle.requestPermission({ mode:'readwrite' });
+      }
+      if (perm === 'granted') {
+        // Restore data from file (file is the source of truth)
+        const restored = await this._readAndRestore(handle);
+        this._handle = handle;
+        if (restored > 0) {
+          // Reinit renders after restoring from file
+          setTimeout(() => {
+            renderProds && renderProds();
+            document.getElementById('sbCoName').textContent = 'Karmavati Tools & Ele';
+          }, 100);
+        }
+      }
+    } catch(e){}
+    this._updateUI();
+  },
+
+  // ── User clicks "Save data to file…" ──
+  async pickFile() {
+    if (!this._hasAPI) { this.exportJSON(); return; }
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: 'karmavati_erp_data.json',
+        types: [{ description:'ERP Data File', accept:{'application/json':['.json']} }]
+      });
+      this._handle = handle;
+      await this._idbSet('dataFile', handle);
+      await this._write();
+      toast('Data file linked — auto-saving every change ✓');
+    } catch(e) {
+      if (e.name !== 'AbortError') toast('File selection cancelled','info');
+    }
+    this._updateUI();
+  },
+
+  // ── Export JSON (fallback for browsers without FS API) ──
+  exportJSON() {
+    const data = this._snapshot();
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'karmavati_erp_backup_' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('Backup downloaded ✓');
+  },
+
+  // ── Import JSON backup ──
+  importJSON() {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = '.json';
+    inp.onchange = async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        let count = 0;
+        Object.entries(data).forEach(([k,v]) => {
+          if (k.startsWith('erp_')) { _ls.setItem(k,v); count++; }
+        });
+        toast('Restored ' + count + ' data entries — refreshing…');
+        setTimeout(() => location.reload(), 900);
+      } catch(e) { toast('Invalid backup file','error'); }
+    };
+    inp.click();
+  },
+
+  // ── Update sidebar status indicator ──
+  _updateUI() {
+    const el = document.getElementById('fpStatus');
+    if (!el) return;
+    if (this._handle) {
+      el.innerHTML =
+        '<span class="fp-ok">💾 Auto-saving to file ✓</span>' +
+        '<span class="fp-warn">Data saved on every change</span>';
+    } else if (this._hasAPI) {
+      el.innerHTML =
+        '<button class="fp-btn" onclick="FP.pickFile()">📁 Link a data file…</button>' +
+        '<span class="fp-warn" style="margin-top:3px;display:block">Click to enable auto-save</span>';
+    } else {
+      el.innerHTML =
+        '<button class="fp-btn" onclick="FP.exportJSON()">⬇ Backup data</button>';
+    }
+  }
+};
+
+// ── Export / Import buttons wired to FP ──
+function fpExport(){ FP.exportJSON(); }
+function fpImport(){ FP.importJSON(); }
+
+// ════════════════════════════════════════════
+//   PRE-SEED: Karmavati Tools & Ele
+// ════════════════════════════════════════════
+(function(){
+  var KV_ID = 'karmavati001';
+  var KV_NM = 'Karmavati Tools & Ele';
+  var ALL   = ['products','sales','pricelist','categories','brands','units'];
+
+  // DB.get/set handle the 'erp_' prefix automatically
+  // DB.get('cos')                   → localStorage key: erp_cos
+  // DB.get('co_karmavati001_users') → localStorage key: erp_co_karmavati001_users
+
+  // 1. Register company
+  var cos = DB.get('cos', []);
+  if (!cos.find(function(c){ return c.id === KV_ID; })) {
+    cos.push({id:KV_ID, name:KV_NM, active:true, paused:false, createdAt:Date.now()});
+    DB.set('cos', cos);
+  }
+
+  // 2. Admin user
+  var uK    = 'co_' + KV_ID + '_users';
+  var users = DB.get(uK, []);
+  if (!users.find(function(u){ return u.role === 'admin'; })) {
+    users.push({id:'kvadm001', u:'Admin', p:'admin', name:'Admin', role:'admin', perms:ALL});
+    DB.set(uK, users);
+  }
+
+  // 3. Default categories
+  var cK2 = 'co_' + KV_ID + '_cats';
+  if (!DB.get(cK2, []).length) {
+    DB.set(cK2, [
+      {id:'kvc1',name:'General'},{id:'kvc2',name:'Electronics'},
+      {id:'kvc3',name:'Hardware'},{id:'kvc4',name:'Electrical'},
+      {id:'kvc5',name:'Lighting'},{id:'kvc6',name:'Tools'}
+    ]);
+  }
+
+  // 4a. Default Units
+  var unitsK = 'co_' + KV_ID + '_units';
+  if (!DB.get(unitsK, []).length) {
+    DB.set(unitsK, [
+      {id:'kuu1',name:'Piece',abbr:'Pcs'},{id:'kuu2',name:'Box',abbr:'Box'},
+      {id:'kuu3',name:'Meter',abbr:'Mtr'},{id:'kuu4',name:'Kilogram',abbr:'Kg'},
+      {id:'kuu5',name:'Liter',abbr:'Ltr'},{id:'kuu6',name:'Coil',abbr:'Coil'},
+      {id:'kuu7',name:'Bundle',abbr:'Bndl'},{id:'kuu8',name:'Roll',abbr:'Rll'},
+      {id:'kuu9',name:'Set',abbr:'Set'},{id:'kuu10',name:'Dozen',abbr:'Dz'}
+    ]);
+  }
+
+  // 4b. Default Brands
+  var brK = 'co_' + KV_ID + '_brands';
+  if (!DB.get(brK, []).length) {
+    DB.set(brK, [
+      {id:'kvb1',name:'Havells'},{id:'kvb2',name:'Anchor'},{id:'kvb3',name:'Polycab'},
+      {id:'kvb4',name:'Schneider'},{id:'kvb5',name:'Legrand'},{id:'kvb6',name:'Philips'},
+      {id:'kvb7',name:'Syska'},{id:'kvb8',name:'Crompton'},{id:'kvb9',name:'Usha'}
+    ]);
+  }
+
+  // 4. Default UOMs
+  var uomK = 'co_' + KV_ID + '_uoms';
+  if (!DB.get(uomK, []).length) {
+    DB.set(uomK, [
+      {id:'kvu1', name:'Piece',    abbr:'Pcs',  type:'Quantity'},
+      {id:'kvu2', name:'Box',      abbr:'Box',  type:'Pack'},
+      {id:'kvu3', name:'Dozen',    abbr:'Dz',   type:'Pack'},
+      {id:'kvu4', name:'Meter',    abbr:'Mtr',  type:'Length'},
+      {id:'kvu5', name:'Kilogram', abbr:'Kg',   type:'Weight'},
+      {id:'kvu6', name:'Liter',    abbr:'Ltr',  type:'Volume'},
+      {id:'kvu7', name:'Roll',     abbr:'Rll',  type:'Pack'},
+      {id:'kvu8', name:'Bundle',   abbr:'Bndl', type:'Pack'},
+      {id:'kvu9', name:'Set',      abbr:'Set',  type:'Quantity'},
+      {id:'kvu10',name:'Coil',     abbr:'Coil', type:'Pack'}
+    ]);
+  }
+})();
+
+
+// ════════════════════════════════════════════
+//   DATA BACKUP / RESTORE
+// ════════════════════════════════════════════
+function exportData(){
+  const KV = 'karmavati001';
+  const keys = _ls.keys().filter(k => k.startsWith('erp_'));
+  const backup = { version:1, company:'Karmavati Tools & Ele', exportedAt: new Date().toISOString(), data:{} };
+  keys.forEach(k => { try{ backup.data[k] = JSON.parse(_ls.getItem(k)) }catch{} });
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const dt = new Date().toISOString().slice(0,10);
+  a.download = 'karmavati_erp_backup_'+dt+'.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Backup saved! Keep this file safe.', 'success');
+}
+
+function importData(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(!confirm('Load backup? This will REPLACE all current data with the backup file.\n\nContinue?')){
+    input.value=''; return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const backup = JSON.parse(e.target.result);
+      if(!backup.data){ toast('Invalid backup file','error'); return; }
+      // Clear existing ERP data
+      _ls.keys().filter(k=>k.startsWith('erp_')).forEach(k=>_ls.removeItem(k));
+      // Restore
+      Object.entries(backup.data).forEach(([k,v])=>_ls.setItem(k, JSON.stringify(v)));
+      toast('Backup loaded! Refreshing…','success');
+      setTimeout(()=>location.reload(), 1200);
+    } catch(err){
+      toast('Failed to load backup: '+err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+
+
+// ════════════════════════════════════════════
+//   PIN LOCK
+// ════════════════════════════════════════════
+const DEFAULT_PIN = '5152';
+let _pinBuf = '';
+
+function getPin(){ return _ls.getItem('erp_pin') || DEFAULT_PIN; }
+function setPin(p){ _ls.setItem('erp_pin', p); }
+
+function pinKey(k){
+  const err = document.getElementById('pinErr');
+  err.textContent = '';
+  if(k === 'clr'){
+    _pinBuf = _pinBuf.slice(0,-1);
+  } else if(k === 'go'){
+    pinCheck();
+    return;
+  } else {
+    if(_pinBuf.length >= 4) return;
+    _pinBuf += k;
+    if(_pinBuf.length === 4) setTimeout(pinCheck, 120);
+  }
+  updatePinDots();
+}
+
+function updatePinDots(){
+  for(let i=0;i<4;i++){
+    const d = document.getElementById('pd'+i);
+    d.classList.toggle('filled', i < _pinBuf.length);
+  }
+}
+
+function pinCheck(){
+  if(_pinBuf === getPin()){
+    document.getElementById('scrPin').style.display = 'none';
+    document.getElementById('scrApp').style.display = '';
+  } else {
+    document.getElementById('pinErr').textContent = 'Wrong PIN. Try again.';
+    // Shake dots
+    for(let i=0;i<4;i++){
+      const d = document.getElementById('pd'+i);
+      d.classList.add('filled','shake');
+      setTimeout(()=>{ d.classList.remove('filled','shake'); },350);
+    }
+    _pinBuf = '';
+    setTimeout(updatePinDots, 360);
+  }
+}
+
+// Allow keyboard input on PIN screen
+document.addEventListener('keydown', function(e){
+  if(document.getElementById('scrPin').style.display === 'none') return;
+  if(e.key >= '0' && e.key <= '9') pinKey(e.key);
+  else if(e.key === 'Backspace') pinKey('clr');
+  else if(e.key === 'Enter') pinKey('go');
+});
+
+function showPinReset(){
+  document.getElementById('rOldPin').value='';
+  document.getElementById('rNewPin').value='';
+  document.getElementById('rConPin').value='';
+  document.getElementById('rPinErr').textContent='';
+  const m = document.getElementById('scrPinReset');
+  m.style.display='flex';
+}
+function hidePinReset(){
+  document.getElementById('scrPinReset').style.display='none';
+}
+function doResetPin(){
+  const old = document.getElementById('rOldPin').value.trim();
+  const nw  = document.getElementById('rNewPin').value.trim();
+  const cn  = document.getElementById('rConPin').value.trim();
+  const err = document.getElementById('rPinErr');
+  if(old !== getPin()){ err.textContent='Current PIN is incorrect.'; return; }
+  if(!/^\d{4}$/.test(nw)){ err.textContent='New PIN must be exactly 4 digits.'; return; }
+  if(nw !== cn){ err.textContent='PINs do not match.'; return; }
+  setPin(nw);
+  hidePinReset();
+  _pinBuf='';
+  updatePinDots();
+  // Show success briefly
+  document.getElementById('pinErr').style.color='#2e7d32';
+  document.getElementById('pinErr').textContent='PIN updated! Enter new PIN to continue.';
+  setTimeout(()=>{
+    document.getElementById('pinErr').style.color='#e53935';
+    document.getElementById('pinErr').textContent='';
+  }, 2500);
+}
+
+// ════════════════════════════════════════════
+//   LANGUAGE / मराठी TOGGLE
+// ════════════════════════════════════════════
+const TRANSLATIONS = {
+  en: {
+    'nav.products':'Products','nav.sales':'Sales','nav.pricelist':'Price List',
+    'nav.masters':'Masters','nav.categories':'Categories','nav.brands':'Brands',
+    'nav.units':'Units','nav.admin':'Admin','nav.adminpanel':'Admin Panel',
+    'nav.data':'Data','nav.savebackup':'Save Backup','nav.loadbackup':'Load Backup',
+    'page.products.title':'Products','page.products.sub':'Manage inventory, barcodes & pricing',
+    'page.sales.title':'Sales','page.sales.sub':'Create bills & track transactions',
+    'page.pricelist.title':'Price List','page.pricelist.sub':'Filter, sort and print pricing',
+    'page.categories.title':'Categories','page.categories.sub':'Organise products',
+    'page.brands.title':'Brands','page.brands.sub':'Manage product brands & manufacturers',
+    'page.units.title':'Units of Measure','page.units.sub':'Manage product units',
+    'page.admin.title':'Admin Panel','page.admin.sub':'Manage users and feature access',
+    'btn.saveprices':'💾 Save Price Changes','btn.template':'⬇ Template',
+    'btn.importcsv':'⬆ Import CSV','btn.export':'📤 Export','btn.scan':'📷 Scan',
+    'btn.addproduct':'+ Add Product','btn.newsale':'+ New Sale',
+    'btn.selectall':'Select All','btn.clear':'Clear','btn.print':'🖨 Print',
+    'btn.addcat':'+ Add Category','btn.addbrand':'+ Add Brand',
+    'btn.addunit':'+ Add Unit','btn.adduser':'+ Add User',
+    'th.barcode':'Barcode','th.productname':'Product Name','th.brand':'Brand',
+    'th.category':'Category','th.unit':'Unit','th.purchaserate':'Purchase Rate ₹',
+    'th.retailrate':'Retail Rate ₹','th.wholesalerate':'Wholesale Rate ₹',
+    'th.actions':'Actions','th.invoice':'Invoice #','th.date':'Date',
+    'th.customer':'Customer','th.items':'Items','th.discount':'Discount',
+    'th.total':'Total','th.status':'Status','th.catname':'Category Name',
+    'th.products':'Products','th.brandname':'Brand Name','th.unitname':'Unit Name',
+    'th.abbr':'Abbreviation','th.username':'Username','th.fullname':'Full Name',
+    'th.role':'Role','th.access':'Accessible Features',
+    'lang.btn':'🌐 मराठी'
+  },
+  mr: {
+    'nav.products':'उत्पादने','nav.sales':'विक्री','nav.pricelist':'किंमत यादी',
+    'nav.masters':'मास्टर्स','nav.categories':'श्रेणी','nav.brands':'ब्रँड',
+    'nav.units':'एकके','nav.admin':'प्रशासक','nav.adminpanel':'प्रशासक पॅनेल',
+    'nav.data':'डेटा','nav.savebackup':'बॅकअप जतन करा','nav.loadbackup':'बॅकअप लोड करा',
+    'page.products.title':'उत्पादने','page.products.sub':'यादी, बारकोड आणि किंमत व्यवस्थापित करा',
+    'page.sales.title':'विक्री','page.sales.sub':'बिल तयार करा आणि व्यवहार ट्रॅक करा',
+    'page.pricelist.title':'किंमत यादी','page.pricelist.sub':'किंमत फिल्टर, क्रमवारी आणि प्रिंट करा',
+    'page.categories.title':'श्रेणी','page.categories.sub':'उत्पादने व्यवस्थित करा',
+    'page.brands.title':'ब्रँड','page.brands.sub':'उत्पादन ब्रँड आणि उत्पादक व्यवस्थापित करा',
+    'page.units.title':'मोजण्याचे एकक','page.units.sub':'उत्पादन एकके व्यवस्थापित करा',
+    'page.admin.title':'प्रशासक पॅनेल','page.admin.sub':'वापरकर्ते आणि वैशिष्ट्य प्रवेश व्यवस्थापित करा',
+    'btn.saveprices':'💾 किंमत बदल जतन करा','btn.template':'⬇ टेम्पलेट',
+    'btn.importcsv':'⬆ CSV आयात करा','btn.export':'📤 निर्यात करा','btn.scan':'📷 स्कॅन',
+    'btn.addproduct':'+ उत्पादन जोडा','btn.newsale':'+ नवीन विक्री',
+    'btn.selectall':'सर्व निवडा','btn.clear':'साफ करा','btn.print':'🖨 प्रिंट करा',
+    'btn.addcat':'+ श्रेणी जोडा','btn.addbrand':'+ ब्रँड जोडा',
+    'btn.addunit':'+ एकक जोडा','btn.adduser':'+ वापरकर्ता जोडा',
+    'th.barcode':'बारकोड','th.productname':'उत्पादनाचे नाव','th.brand':'ब्रँड',
+    'th.category':'श्रेणी','th.unit':'एकक','th.purchaserate':'खरेदी दर ₹',
+    'th.retailrate':'किरकोळ दर ₹','th.wholesalerate':'घाऊक दर ₹',
+    'th.actions':'कृती','th.invoice':'बीजक #','th.date':'तारीख',
+    'th.customer':'ग्राहक','th.items':'वस्तू','th.discount':'सूट',
+    'th.total':'एकूण','th.status':'स्थिती','th.catname':'श्रेणीचे नाव',
+    'th.products':'उत्पादने','th.brandname':'ब्रँडचे नाव','th.unitname':'एककाचे नाव',
+    'th.abbr':'संक्षेप','th.username':'वापरकर्तानाव','th.fullname':'पूर्ण नाव',
+    'th.role':'भूमिका','th.access':'प्रवेशयोग्य वैशिष्ट्ये',
+    'lang.btn':'🌐 English'
+  }
+};
+
+let _lang = _ls.getItem('erp_lang') || 'en';
+
+function applyLang(lang) {
+  _lang = lang;
+  _ls.setItem('erp_lang', lang);
+  const T = TRANSLATIONS[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (T[key] !== undefined) el.textContent = T[key];
+  });
+  const btn = document.getElementById('langToggle');
+  if (btn) btn.textContent = T['lang.btn'];
+  // Re-render active page so dynamic content picks up language
+  const activePage = document.querySelector('.page.on');
+  if (activePage) {
+    const name = activePage.id.replace('page-','');
+    if (pageRen[name]) pageRen[name]();
+  }
+}
+
+function toggleLang() {
+  applyLang(_lang === 'en' ? 'mr' : 'en');
+}
+
+// Helper used by render functions for dynamic content
+function t(key) { return (TRANSLATIONS[_lang] || TRANSLATIONS['en'])[key] || key; }
+
+// ── AUTO INIT: Karmavati Tools & Ele ──
+(function(){
+  var KV_ID = 'karmavati001';
+  _cid = KV_ID;
+  Object.assign(ST, {
+    role: 'admin',
+    cid: KV_ID,
+    uid: 'kvadm001',
+    u: 'Admin',
+    name: 'Admin',
+    perms: ['products','sales','pricelist','categories','brands','units'],
+    coName: 'Karmavati Tools & Ele'
+  });
+  initApp();
+  applyLang(_lang);
+})();
+</script>
+</body>
+</html>
