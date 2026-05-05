@@ -2969,5 +2969,117 @@ function t(key) { return (TRANSLATIONS[_lang] || TRANSLATIONS['en'])[key] || key
   applyLang(_lang);
 })();
 </script>
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAZe-tgi4EcJObscpu2yo6cqs5IaKOgtks",
+  authDomain: "karmavati-5f887.firebaseapp.com",
+  databaseURL: "https://karmavati-5f887-default-rtdb.firebaseio.com",
+  projectId: "karmavati-5f887",
+  storageBucket: "karmavati-5f887.firebasestorage.app",
+  messagingSenderId: "1018578084304",
+  appId: "1:1018578084304:web:28b536997aaf5c848999d5"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+const ROOT = 'karmavati';
+
+// ── Cloud DB API (mirrors the localStorage DB object) ──
+window.CloudDB = {
+  async get(k) {
+    const snap = await get(ref(db, ROOT+'/'+k));
+    return snap.exists() ? snap.val() : null;
+  },
+  async set(k, v) {
+    await set(ref(db, ROOT+'/'+k), v);
+  },
+  async del(k) {
+    await remove(ref(db, ROOT+'/'+k));
+  },
+  // Live sync: call cb whenever key changes
+  listen(k, cb) {
+    onValue(ref(db, ROOT+'/'+k), snap => {
+      cb(snap.exists() ? snap.val() : null);
+    });
+  }
+};
+
+// ── Replace localStorage DB with Firebase ──
+// Wrap async Firebase calls so existing sync code works via a write-through cache
+window._fbReady = false;
+window._fbCache = {};
+
+async function fbSync() {
+  // Load all keys from Firebase into local cache on startup
+  const snap = await get(ref(db, ROOT));
+  if (snap.exists()) {
+    const data = snap.val();
+    Object.keys(data).forEach(k => {
+      window._fbCache[k] = data[k];
+      localStorage.setItem('erp_' + k, JSON.stringify(data[k]));
+    });
+  }
+  window._fbReady = true;
+
+  // Now live-sync: any change in Firebase → update localStorage + re-render
+  onValue(ref(db, ROOT), snap => {
+    if (!snap.exists()) return;
+    const data = snap.val();
+    let changed = false;
+    Object.keys(data).forEach(k => {
+      const fresh = JSON.stringify(data[k]);
+      if (localStorage.getItem('erp_' + k) !== fresh) {
+        localStorage.setItem('erp_' + k, fresh);
+        window._fbCache[k] = data[k];
+        changed = true;
+      }
+    });
+    if (changed && window._fbReady) {
+      // Re-render whatever page is open
+      const activePage = document.querySelector('.page.on');
+      if (activePage) {
+        const name = activePage.id.replace('page-', '');
+        if (window.pageRen && window.pageRen[name]) window.pageRen[name]();
+      }
+    }
+  });
+}
+
+// Override DB.set so every write goes to both localStorage AND Firebase
+const _origSet = window._ls ? null : null;
+document.addEventListener('DOMContentLoaded', () => {
+  // Patch DB.set to also write to Firebase
+  const origDBset = DB.set.bind(DB);
+  DB.set = function(k, v) {
+    origDBset(k, v); // write localStorage immediately (fast UI)
+    set(ref(db, ROOT + '/' + k), v).catch(e => console.warn('Firebase write failed:', e));
+  };
+  DB.del = function(k) {
+    localStorage.removeItem('erp_' + k);
+    remove(ref(db, ROOT + '/' + k)).catch(e => console.warn('Firebase delete failed:', e));
+  };
+
+  // Show sync status
+  const status = document.getElementById('saveStatus');
+
+  fbSync().then(() => {
+    if (status) status.textContent = '☁️ Synced with cloud';
+    // Re-render after initial load
+    const activePage = document.querySelector('.page.on');
+    if (activePage) {
+      const name = activePage.id.replace('page-', '');
+      if (window.pageRen && window.pageRen[name]) window.pageRen[name]();
+    }
+  }).catch(e => {
+    if (status) { status.textContent = '⚠️ Offline — changes saved locally'; status.style.color = '#e67e22'; }
+    console.warn('Firebase sync failed, running offline:', e);
+  });
+});
+</script>
+
 </body>
 </html>
