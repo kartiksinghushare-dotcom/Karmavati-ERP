@@ -253,7 +253,7 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
 
 /* ── PRODUCT AUTOCOMPLETE DROPDOWN ── */
 .ac-wrap{position:relative}
-.ac-drop{display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border:1.5px solid var(--gold);border-radius:var(--r);box-shadow:var(--sh2);z-index:500;max-height:200px;overflow-y:auto;margin-top:2px}
+.ac-drop{display:none;position:fixed;background:var(--card);border:1.5px solid var(--gold);border-radius:var(--r);box-shadow:var(--sh3);z-index:9000;max-height:220px;overflow-y:auto;margin-top:2px}
 .ac-drop.open{display:block}
 .ac-item{padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--bord2);display:flex;flex-direction:column;gap:2px}
 .ac-item:last-child{border-bottom:none}
@@ -538,7 +538,7 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
           <button class="btn btn-gn" id="savePricesBtnPL" onclick="saveAllPrices()" style="display:none"><span data-i18n="btn.saveprices">💾 Save Price Changes</span></button>
           <button class="btn btn-ou btn-sm" onclick="plSelAll()"><span data-i18n="btn.selectall">Select All</span></button>
           <button class="btn btn-ou btn-sm" onclick="plClrAll()"><span data-i18n="btn.clear">Clear</span></button>
-          <button class="btn btn-dk" onclick="printPL()"><span data-i18n="btn.print">🖨 Print</span></button>
+          <button class="btn btn-dk" onclick="openPrintPLOptions()"><span data-i18n="btn.print">🖨 Print</span></button>
         </div>
       </div>
       <div class="card mb4"><div class="card-b" style="padding:12px 16px">
@@ -559,9 +559,11 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
         <table><thead><tr>
           <th style="width:40px"><input type="checkbox" id="plCA" onchange="plTogAll(this.checked)" style="cursor:pointer;width:15px;height:15px"></th>
           <th data-i18n="th.productname">Product</th><th data-i18n="th.brand">Brand</th><th data-i18n="th.category">Category</th><th data-i18n="th.unit">Unit</th>
-          <th style="min-width:90px" data-i18n="th.purchaserate">Purchase Rate ₹</th>
-          <th style="min-width:90px" data-i18n="th.retailrate">Retail Rate ₹</th>
-          <th style="min-width:90px" data-i18n="th.wholesalerate">Wholesale Rate ₹</th>
+          <th style="min-width:90px" data-i18n="th.purchaserate">Purchase ₹</th>
+          <th style="min-width:80px;color:var(--gn)">Retail %↑</th>
+          <th style="min-width:90px" data-i18n="th.retailrate">Retail ₹</th>
+          <th style="min-width:80px;color:var(--gold)">WS %↑</th>
+          <th style="min-width:90px" data-i18n="th.wholesalerate">Wholesale ₹</th>
         </tr></thead>
         <tbody id="plTb"></tbody></table>
       </div></div></div>
@@ -779,6 +781,41 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
   </div>
 </div>
 
+
+<!-- PRICE LIST PRINT OPTIONS -->
+<div class="mo" id="mPLPrint">
+  <div class="md md-sm">
+    <div class="md-h"><div class="md-t">🖨 Print Options</div><button class="md-c" onclick="closeM('mPLPrint')">✕</button></div>
+    <div class="md-b">
+      <div class="fsec" style="margin-bottom:14px">Recipient</div>
+      <div class="fgrp mb4">
+        <label class="flbl">Print Title / Label</label>
+        <input class="fc" id="plPrintTitle" placeholder="e.g. Retail Price List, For ABC Hardware…">
+        <div class="fc-hint">Appears as subtitle on the printed sheet</div>
+      </div>
+      <div class="fsec" style="margin-bottom:14px">Price Columns to Include</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:6px">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500">
+          <input type="checkbox" id="plPrPP" checked style="width:16px;height:16px;cursor:pointer">
+          Purchase Price (Cost Price)
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500">
+          <input type="checkbox" id="plPrRP" checked style="width:16px;height:16px;cursor:pointer">
+          Retail Price (MRP)
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500">
+          <input type="checkbox" id="plPrWP" checked style="width:16px;height:16px;cursor:pointer">
+          Wholesale Price (Trade)
+        </label>
+      </div>
+      <div style="font-size:11.5px;color:var(--ink3);margin-top:8px">💡 Tip: uncheck Purchase Price before sharing with customers</div>
+    </div>
+    <div class="md-f">
+      <button class="btn btn-ou" onclick="closeM('mPLPrint')">Cancel</button>
+      <button class="btn btn-dk" onclick="doPrintPL()">🖨 Print</button>
+    </div>
+  </div>
+</div>
 
 <!-- CATEGORY -->
 <div class="mo" id="mCat"><div class="md md-xs">
@@ -1431,7 +1468,8 @@ function buildAcItems(i, val){
 
 function renderAcDrop(i, val){
   const drop=document.getElementById('acd_'+i);
-  if(!drop)return;
+  const inp=document.getElementById('sn_'+i);
+  if(!drop||!inp)return;
   const items=buildAcItems(i,val);
   if(!items.length){drop.classList.remove('open');return}
   const type=document.getElementById('sPT')?.value||'retail';
@@ -1444,6 +1482,11 @@ function renderAcDrop(i, val){
       <span class="ac-item-sub">${esc(p.bc)} · ${esc(p.co||'')} · ₹${type==='retail'?p.rp:p.wp}</span>
     </div>`).join('');
   drop._items=items;
+  // Position fixed relative to input
+  const rect=inp.getBoundingClientRect();
+  drop.style.top=(rect.bottom+2)+'px';
+  drop.style.left=rect.left+'px';
+  drop.style.width=rect.width+'px';
   drop.classList.add('open');
 }
 
@@ -1573,6 +1616,39 @@ function saveSale(){
 function delSale(id){if(!confirm('Delete this sale?'))return;sS(gS().filter(s=>s.id!==id));rSales();toast('Deleted','info')}
 
 let _plSel=new Set();
+function pctInput(prodId, field, pp, price, colorCls){
+  const pp2=parseFloat(pp)||0;
+  const pr=parseFloat(price)||0;
+  const pct=pp2>0?((pr-pp2)/pp2*100):0;
+  const arrow=pct>=0?'↑':'↓';
+  const col=pct>=0?'var(--gn)':'var(--rd)';
+  return `<div style="display:flex;align-items:center;gap:4px">
+    <span style="color:${col};font-size:13px;font-weight:700">${arrow}</span>
+    <input type="number" step="0.1" min="-99" max="9999"
+      style="width:62px;padding:5px 6px;font-size:12.5px;border:1.5px solid var(--bord);border-radius:6px;background:var(--surf);color:${col};font-weight:700;text-align:center;outline:none"
+      value="${pct.toFixed(1)}"
+      title="Edit % to update ${field==='rp'?'Retail':'Wholesale'} price"
+      oninput="onPctChange('${prodId}','${field}',this.value)"
+      onfocus="this.style.borderColor='var(--gold)'"
+      onblur="this.style.borderColor='var(--bord)'">
+    <span style="font-size:11px;color:var(--ink3)">%</span>
+  </div>`;
+}
+
+function onPctChange(prodId, field, pctVal){
+  const pct=parseFloat(pctVal);
+  if(isNaN(pct))return;
+  // Find current purchase price
+  const ppInp=document.getElementById('pl_'+prodId+'_pp');
+  const pp=parseFloat(ppInp?.value)||0;
+  if(!pp)return;
+  const newPrice=parseFloat((pp*(1+pct/100)).toFixed(2));
+  // Update price input
+  const prInp=document.getElementById('pl_'+prodId+'_'+field);
+  if(prInp)prInp.value=newPrice.toFixed(2);
+  markPriceDirty(prodId,field,newPrice);
+}
+
 function renderPL(){
   const prods=gP(),q=(document.getElementById('plSrch')?.value||'').toLowerCase(),cat=document.getElementById('plCatF')?.value||'',co=document.getElementById('plCoF')?.value||'',srt=document.getElementById('plSort')?.value||'name-asc';
   const cats=[...new Set(prods.map(p=>p.cat).filter(Boolean))].sort();
@@ -1588,33 +1664,56 @@ function renderPL(){
     <td>${p.cat?`<span class="badge b-bl">${esc(p.cat)}</span>`:'—'}</td>
     <td><span class="badge b-nt">${esc(p.uom||'Pcs')}</span></td>
     <td>${priceInput(p.id,'pp',p.pp,'pp','pl')}</td>
+    <td>${pctInput(p.id,'rp',p.pp,p.rp,'gn')}</td>
     <td>${priceInput(p.id,'rp',p.rp,'rp','pl')}</td>
+    <td>${pctInput(p.id,'wp',p.pp,p.wp,'go')}</td>
     <td>${priceInput(p.id,'wp',p.wp,'wp','pl')}</td>
-  </tr>`).join('')||'<tr><td colspan="8"><div class="empty"><p>No products match</p></div></td></tr>';
+  </tr>`).join('')||'<tr><td colspan="10"><div class="empty"><p>No products match</p></div></td></tr>';
 }
 function plTog(id,c){if(c)_plSel.add(id);else _plSel.delete(id)}
 function plTogAll(c){gP().forEach(p=>c?_plSel.add(p.id):_plSel.delete(p.id));renderPL()}
 function plSelAll(){document.getElementById('plCA').checked=true;plTogAll(true)}
 function plClrAll(){document.getElementById('plCA').checked=false;plTogAll(false)}
-function printPL(){
+
+function openPrintPLOptions(){
+  const prods=gP();
+  const list=_plSel.size>0?prods.filter(p=>_plSel.has(p.id)):prods;
+  if(!list.length){toast('No products to print','error');return}
+  openM('mPLPrint');
+}
+
+function doPrintPL(){
   const prods=gP();
   const list=_plSel.size>0?prods.filter(p=>_plSel.has(p.id)):prods;
   if(!list.length){toast('No products selected','error');return}
-  const rows=list.map((p,i)=>`<tr>
-    <td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(p.co||'—')}</td><td>${esc(p.cat||'—')}</td>
-    <td>${esc(p.uom||'Pcs')}</td>
-    <td>₹${parseFloat(p.pp||0).toFixed(2)}</td>
-    <td>₹${parseFloat(p.rp||0).toFixed(2)}</td>
-    <td>₹${parseFloat(p.wp||0).toFixed(2)}</td>
-  </tr>`).join('');
+  const showPP=document.getElementById('plPrPP')?.checked;
+  const showRP=document.getElementById('plPrRP')?.checked;
+  const showWP=document.getElementById('plPrWP')?.checked;
+  const subtitle=document.getElementById('plPrintTitle')?.value.trim()||'';
+  closeM('mPLPrint');
+
+  const hdCols=[
+    '<th>#</th><th>Product</th><th>Brand</th><th>Unit</th>',
+    showPP?'<th>Purchase ₹</th>':'',
+    showRP?'<th>Retail ₹</th>':'',
+    showWP?'<th>Wholesale ₹</th>':''
+  ].join('');
+
+  const rows=list.map((p,i)=>{
+    const pp=parseFloat(p.pp||0),rp=parseFloat(p.rp||0),wp=parseFloat(p.wp||0);
+    return`<tr>
+      <td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(p.co||'—')}</td><td>${esc(p.uom||'Pcs')}</td>
+      ${showPP?`<td>₹${pp.toFixed(2)}</td>`:''}
+      ${showRP?`<td>₹${rp.toFixed(2)}</td>`:''}
+      ${showWP?`<td>₹${wp.toFixed(2)}</td>`:''}
+    </tr>`;
+  }).join('');
+
   doPrint(`<div class="pl-pr">
     <h1>${esc(ST.coName||'Store')}</h1>
-    <div class="pl-dt">Price List — ${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})}</div>
-    <table><thead><tr>
-      <th>#</th><th>Product</th><th>Brand</th><th>Category</th>
-      <th>Unit</th>
-      <th>Purchase Rate ₹</th><th>Retail Rate ₹</th><th>Wholesale Rate ₹</th>
-    </tr></thead><tbody>${rows}</tbody></table>
+    ${subtitle?`<div class="pl-dt" style="font-weight:600;font-size:13px;margin-bottom:4px">${esc(subtitle)}</div>`:''}
+    <div class="pl-dt">Date: ${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})}</div>
+    <table><thead><tr>${hdCols}</tr></thead><tbody>${rows}</tbody></table>
     <p style="text-align:center;font-size:11px;color:#888;margin-top:14px">Prices subject to change · ${esc(ST.coName)}</p>
   </div>`,{size:'a4'});
 }
