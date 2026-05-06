@@ -787,28 +787,26 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
   <div class="md md-sm">
     <div class="md-h"><div class="md-t">🖨 Print Options</div><button class="md-c" onclick="closeM('mPLPrint')">✕</button></div>
     <div class="md-b">
-      <div class="fsec" style="margin-bottom:14px">Recipient</div>
+      <div class="fsec" style="margin-bottom:14px">Recipient / Title</div>
       <div class="fgrp mb4">
         <label class="flbl">Print Title / Label</label>
         <input class="fc" id="plPrintTitle" placeholder="e.g. Retail Price List, For ABC Hardware…">
         <div class="fc-hint">Appears as subtitle on the printed sheet</div>
       </div>
-      <div class="fsec" style="margin-bottom:14px">Price Columns to Include</div>
+      <div class="fsec" style="margin-bottom:14px">Columns to Include</div>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:6px">
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500">
-          <input type="checkbox" id="plPrPP" checked style="width:16px;height:16px;cursor:pointer">
-          Purchase Price (Cost Price)
-        </label>
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500">
-          <input type="checkbox" id="plPrRP" checked style="width:16px;height:16px;cursor:pointer">
-          Retail Price (MRP)
-        </label>
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500">
-          <input type="checkbox" id="plPrWP" checked style="width:16px;height:16px;cursor:pointer">
-          Wholesale Price (Trade)
-        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrSN" checked style="width:16px;height:16px;cursor:pointer"> # (Serial No.)</label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrNM" checked style="width:16px;height:16px;cursor:pointer"> Product Name</label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrBR" checked style="width:16px;height:16px;cursor:pointer"> Brand</label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrCA" checked style="width:16px;height:16px;cursor:pointer"> Category</label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrUN" checked style="width:16px;height:16px;cursor:pointer"> Unit</label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrPP" checked style="width:16px;height:16px;cursor:pointer"> Purchase Price ₹</label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrRP" checked style="width:16px;height:16px;cursor:pointer"> Retail Price ₹ (MRP)</label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrWP" checked style="width:16px;height:16px;cursor:pointer"> Wholesale Price ₹ (Trade)</label>
       </div>
-      <div style="font-size:11.5px;color:var(--ink3);margin-top:8px">💡 Tip: uncheck Purchase Price before sharing with customers</div>
+      <div style="font-size:11.5px;color:var(--ink3);margin-top:10px;background:var(--goldd);border:1px solid var(--goldb);border-radius:6px;padding:8px 12px">
+        💡 Uncheck Purchase Price before sharing with customers or traders
+      </div>
     </div>
     <div class="md-f">
       <button class="btn btn-ou" onclick="closeM('mPLPrint')">Cancel</button>
@@ -1686,6 +1684,11 @@ function doPrintPL(){
   const prods=gP();
   const list=_plSel.size>0?prods.filter(p=>_plSel.has(p.id)):prods;
   if(!list.length){toast('No products selected','error');return}
+  const showSN=document.getElementById('plPrSN')?.checked;
+  const showNM=document.getElementById('plPrNM')?.checked;
+  const showBR=document.getElementById('plPrBR')?.checked;
+  const showCA=document.getElementById('plPrCA')?.checked;
+  const showUN=document.getElementById('plPrUN')?.checked;
   const showPP=document.getElementById('plPrPP')?.checked;
   const showRP=document.getElementById('plPrRP')?.checked;
   const showWP=document.getElementById('plPrWP')?.checked;
@@ -1693,7 +1696,11 @@ function doPrintPL(){
   closeM('mPLPrint');
 
   const hdCols=[
-    '<th>#</th><th>Product</th><th>Brand</th><th>Unit</th>',
+    showSN?'<th>#</th>':'',
+    showNM?'<th>Product Name</th>':'',
+    showBR?'<th>Brand</th>':'',
+    showCA?'<th>Category</th>':'',
+    showUN?'<th>Unit</th>':'',
     showPP?'<th>Purchase ₹</th>':'',
     showRP?'<th>Retail ₹</th>':'',
     showWP?'<th>Wholesale ₹</th>':''
@@ -1702,7 +1709,11 @@ function doPrintPL(){
   const rows=list.map((p,i)=>{
     const pp=parseFloat(p.pp||0),rp=parseFloat(p.rp||0),wp=parseFloat(p.wp||0);
     return`<tr>
-      <td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(p.co||'—')}</td><td>${esc(p.uom||'Pcs')}</td>
+      ${showSN?`<td>${i+1}</td>`:''}
+      ${showNM?`<td>${esc(p.name)}</td>`:''}
+      ${showBR?`<td>${esc(p.co||'—')}</td>`:''}
+      ${showCA?`<td>${esc(p.cat||'—')}</td>`:''}
+      ${showUN?`<td>${esc(p.uom||'Pcs')}</td>`:''}
       ${showPP?`<td>₹${pp.toFixed(2)}</td>`:''}
       ${showRP?`<td>₹${rp.toFixed(2)}</td>`:''}
       ${showWP?`<td>₹${wp.toFixed(2)}</td>`:''}
