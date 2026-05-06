@@ -513,7 +513,7 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
         </div>
       </div></div>
       <div class="card"><div class="card-b0"><div class="tw">
-        <table><thead><tr><th style="min-width:165px" data-i18n="th.barcode">Barcode</th><th data-i18n="th.productname">Product Name</th><th data-i18n="th.brand">Brand</th><th data-i18n="th.category">Category</th><th data-i18n="th.unit">Unit</th><th style="min-width:90px" data-i18n="th.purchaserate">Purchase Rate ₹</th><th style="min-width:90px" data-i18n="th.retailrate">Retail Rate ₹</th><th style="min-width:90px" data-i18n="th.wholesalerate">Wholesale Rate ₹</th><th data-i18n="th.actions">Actions</th></tr></thead>
+        <table><thead><tr><th style="min-width:165px" data-i18n="th.barcode">Barcode</th><th data-i18n="th.productname">Product Name</th><th data-i18n="th.brand">Brand</th><th data-i18n="th.category">Category</th><th data-i18n="th.unit">Unit</th><th style="min-width:90px" data-i18n="th.purchaserate">Purchase Rate ₹</th><th style="min-width:90px" data-i18n="th.wholesalerate">Wholesale Rate ₹</th><th style="min-width:90px" data-i18n="th.retailrate">Retail Rate ₹</th><th data-i18n="th.actions">Actions</th></tr></thead>
         <tbody id="prodTb"></tbody></table>
       </div></div></div>
     </div>
@@ -560,10 +560,10 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
           <th style="width:40px"><input type="checkbox" id="plCA" onchange="plTogAll(this.checked)" style="cursor:pointer;width:15px;height:15px"></th>
           <th data-i18n="th.productname">Product</th><th data-i18n="th.brand">Brand</th><th data-i18n="th.category">Category</th><th data-i18n="th.unit">Unit</th>
           <th style="min-width:90px" data-i18n="th.purchaserate">Purchase ₹</th>
-          <th style="min-width:80px;color:var(--gn)">Retail %↑</th>
-          <th style="min-width:90px" data-i18n="th.retailrate">Retail ₹</th>
           <th style="min-width:80px;color:var(--gold)">WS %↑</th>
           <th style="min-width:90px" data-i18n="th.wholesalerate">Wholesale ₹</th>
+          <th style="min-width:80px;color:var(--gn)">Retail %↑</th>
+          <th style="min-width:90px" data-i18n="th.retailrate">Retail ₹</th>
         </tr></thead>
         <tbody id="plTb"></tbody></table>
       </div></div></div>
@@ -642,8 +642,8 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
       <div class="mb4"><div class="fsec">Pricing (Rate Card)</div>
         <div class="fg fg3">
           <div class="fgrp"><label class="flbl">Purchase Rate ₹ (Cost Price) <span class="req">*</span></label><input class="fc" id="pPP" type="number" min="0" placeholder="e.g. 150"></div>
-          <div class="fgrp"><label class="flbl">Retail Selling Rate ₹ (MRP) <span class="req">*</span></label><input class="fc" id="pRP" type="number" min="0" placeholder="e.g. 200"></div>
           <div class="fgrp"><label class="flbl">Wholesale Selling Rate ₹ (Trade) <span class="req">*</span></label><input class="fc" id="pWP" type="number" min="0" placeholder="e.g. 180"></div>
+          <div class="fgrp"><label class="flbl">Retail Selling Rate ₹ (MRP) <span class="req">*</span></label><input class="fc" id="pRP" type="number" min="0" placeholder="e.g. 200"></div>
         </div>
       </div>
     </div>
@@ -706,7 +706,7 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
     <div class="md-h"><div class="md-t">Import Products via CSV</div><button class="md-c" onclick="closeM('mCSV')">✕</button></div>
     <div class="md-b">
       <div style="background:var(--gnd);border:1px solid var(--gnb);border-radius:var(--r);padding:12px 14px;font-size:12.5px;color:var(--gn);margin-bottom:16px">
-        📋 <strong>Columns:</strong> Barcode (optional), Product Name, Brand, Category, Unit, Purchase Rate, Retail Rate, Wholesale Rate<br>
+        📋 <strong>Columns:</strong> Barcode (optional), Product Name, Brand, Category, Unit, Purchase Rate, Wholesale Rate, Retail Rate<br>
         <span style="font-size:11.5px;color:var(--ink2);margin-top:4px;display:block">
           ✅ Leave <strong>Barcode blank</strong> — a unique one will be auto-generated.<br>
           ✅ Lines starting with <strong>#</strong> are treated as comments and ignored.<br>
@@ -801,8 +801,8 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
         <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrCA" checked style="width:16px;height:16px;cursor:pointer"> Category</label>
         <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrUN" checked style="width:16px;height:16px;cursor:pointer"> Unit</label>
         <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrPP" checked style="width:16px;height:16px;cursor:pointer"> Purchase Price ₹</label>
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrRP" checked style="width:16px;height:16px;cursor:pointer"> Retail Price ₹ (MRP)</label>
         <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrWP" checked style="width:16px;height:16px;cursor:pointer"> Wholesale Price ₹ (Trade)</label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:500"><input type="checkbox" id="plPrRP" checked style="width:16px;height:16px;cursor:pointer"> Retail Price ₹ (MRP)</label>
       </div>
       <div style="font-size:11.5px;color:var(--ink3);margin-top:10px;background:var(--goldd);border:1px solid var(--goldb);border-radius:6px;padding:8px 12px">
         💡 Uncheck Purchase Price before sharing with customers or traders
@@ -1276,8 +1276,8 @@ function renderProds(){
     <td>${p.cat?`<span class="badge b-bl">${esc(p.cat)}</span>`:'—'}</td>
     <td><span class="badge b-nt">${esc(p.uom||'Pcs')}</span></td>
     <td>${priceInput(p.id,'pp',p.pp,'pp','pi')}</td>
-    <td>${priceInput(p.id,'rp',p.rp,'rp','pi')}</td>
     <td>${priceInput(p.id,'wp',p.wp,'wp','pi')}</td>
+    <td>${priceInput(p.id,'rp',p.rp,'rp','pi')}</td>
     <td><div style="display:flex;gap:6px"><button class="btn btn-ou btn-sm" onclick="openProdModal('${p.id}')">Edit</button><button class="btn btn-rd btn-sm" onclick="delProd('${p.id}')">✕</button></div></td>
   </tr>`).join('');
   setTimeout(()=>list.forEach(p=>{const el=document.getElementById('bc_'+p.id);if(el)try{JsBarcode(el,p.bc||'000000000000',{format:'CODE128',width:1.4,height:36,displayValue:false,margin:2,background:'#fff',lineColor:'#1a1410'})}catch{}}),60);
@@ -1662,10 +1662,10 @@ function renderPL(){
     <td>${p.cat?`<span class="badge b-bl">${esc(p.cat)}</span>`:'—'}</td>
     <td><span class="badge b-nt">${esc(p.uom||'Pcs')}</span></td>
     <td>${priceInput(p.id,'pp',p.pp,'pp','pl')}</td>
-    <td>${pctInput(p.id,'rp',p.pp,p.rp,'gn')}</td>
-    <td>${priceInput(p.id,'rp',p.rp,'rp','pl')}</td>
     <td>${pctInput(p.id,'wp',p.pp,p.wp,'go')}</td>
     <td>${priceInput(p.id,'wp',p.wp,'wp','pl')}</td>
+    <td>${pctInput(p.id,'rp',p.pp,p.rp,'gn')}</td>
+    <td>${priceInput(p.id,'rp',p.rp,'rp','pl')}</td>
   </tr>`).join('')||'<tr><td colspan="10"><div class="empty"><p>No products match</p></div></td></tr>';
 }
 function plTog(id,c){if(c)_plSel.add(id);else _plSel.delete(id)}
@@ -1702,8 +1702,8 @@ function doPrintPL(){
     showCA?'<th>Category</th>':'',
     showUN?'<th>Unit</th>':'',
     showPP?'<th>Purchase ₹</th>':'',
-    showRP?'<th>Retail ₹</th>':'',
-    showWP?'<th>Wholesale ₹</th>':''
+    showWP?'<th>Wholesale ₹</th>':'',
+    showRP?'<th>Retail ₹</th>':''
   ].join('');
 
   const rows=list.map((p,i)=>{
@@ -1715,8 +1715,8 @@ function doPrintPL(){
       ${showCA?`<td>${esc(p.cat||'—')}</td>`:''}
       ${showUN?`<td>${esc(p.uom||'Pcs')}</td>`:''}
       ${showPP?`<td>₹${pp.toFixed(2)}</td>`:''}
-      ${showRP?`<td>₹${rp.toFixed(2)}</td>`:''}
       ${showWP?`<td>₹${wp.toFixed(2)}</td>`:''}
+      ${showRP?`<td>₹${rp.toFixed(2)}</td>`:''}
     </tr>`;
   }).join('');
 
@@ -1820,7 +1820,7 @@ function delCat(id){const prods=gP(),cat=gC().find(c=>c.id===id);if(cat&&prods.f
 // ════════════════════════════════════════════
 //   CSV IMPORT / EXPORT
 // ════════════════════════════════════════════
-const CSV_HEADERS=['Barcode (leave blank to auto-generate)','Product Name','Brand','Category','Unit','Purchase Rate (₹)','Retail Rate / MRP (₹)','Wholesale Rate / Trade (₹)'];
+const CSV_HEADERS=['Barcode (leave blank to auto-generate)','Product Name','Brand','Category','Unit','Purchase Rate (₹)','Wholesale Rate / Trade (₹)','Retail Rate / MRP (₹)'];
 
 function downloadTemplate(){
   function q(v){const s=String(v||'');return s.includes(',')||s.includes('"')?'"'+s.replace(/"/g,'""')+'"':s}
@@ -1856,7 +1856,7 @@ function exportProducts(){
     CSV_HEADERS.map(q).join(',')
   ];
   prods.forEach(p=>{
-    rows.push([q(p.bc),q(p.name),q(p.co||''),q(p.cat||''),q(p.uom||'Piece'),q(p.pp||0),q(p.rp||0),q(p.wp||0)].join(','));
+    rows.push([q(p.bc),q(p.name),q(p.co||''),q(p.cat||''),q(p.uom||'Piece'),q(p.pp||0),q(p.wp||0),q(p.rp||0)].join(','));
   });
   const blob=new Blob(['\uFEFF'+rows.join('\r\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
