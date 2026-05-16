@@ -1741,16 +1741,15 @@ function plcSetAll(v){
 }
 
 function plFontTier(n){
-  // All sizes in absolute print units (pt / mm) — renders identically on Windows & Mac
   // n = number of data columns chosen (excluding the # index column)
-  // rateW = width for ₹ columns | textW = width for brand/cat | unitW = width for unit col
-  if(n<=1)  return {font:'22pt', head:'20pt', pad:'6mm',   title:'28pt', idxW:'10mm', rateW:'45mm', textW:'34mm', unitW:'20mm', label:'Extra Large', cls:'t-big'};
-  if(n===2) return {font:'16pt', head:'15pt', pad:'5mm',   title:'24pt', idxW:'10mm', rateW:'38mm', textW:'28mm', unitW:'17mm', label:'Very Large',  cls:'t-big'};
-  if(n===3) return {font:'13pt', head:'13pt', pad:'4mm',   title:'22pt', idxW:'9mm',  rateW:'30mm', textW:'23mm', unitW:'15mm', label:'Large',       cls:'t-big'};
-  if(n===4) return {font:'11pt', head:'11pt', pad:'3mm',   title:'20pt', idxW:'9mm',  rateW:'27mm', textW:'21mm', unitW:'14mm', label:'Medium',      cls:'t-med'};
-  if(n===5) return {font:'9pt',  head:'9pt',  pad:'2.5mm', title:'18pt', idxW:'8mm',  rateW:'24mm', textW:'19mm', unitW:'13mm', label:'Comfortable', cls:'t-med'};
-  if(n===6) return {font:'8pt',  head:'8pt',  pad:'2mm',   title:'17pt', idxW:'8mm',  rateW:'22mm', textW:'17mm', unitW:'12mm', label:'Compact',     cls:'t-sm'};
-  return     {font:'7.5pt', head:'7.5pt', pad:'1.5mm', title:'16pt', idxW:'8mm',  rateW:'20mm', textW:'16mm', unitW:'11mm', label:'Standard',    cls:'t-sm'};
+  // All sizes in pt / mm — absolute print units, same on Mac & Windows
+  if(n<=1)  return {font:'26pt', head:'24pt', pad:'8mm',   title:'32pt', idxW:'12mm', rateW:'55mm', textW:'40mm', unitW:'24mm', label:'Extra Large', cls:'t-big'};
+  if(n===2) return {font:'20pt', head:'18pt', pad:'7mm',   title:'28pt', idxW:'11mm', rateW:'46mm', textW:'34mm', unitW:'21mm', label:'Very Large',  cls:'t-big'};
+  if(n===3) return {font:'16pt', head:'15pt', pad:'5mm',   title:'24pt', idxW:'10mm', rateW:'38mm', textW:'28mm', unitW:'18mm', label:'Large',       cls:'t-big'};
+  if(n===4) return {font:'14pt', head:'13pt', pad:'4.5mm', title:'22pt', idxW:'10mm', rateW:'38mm', textW:'25mm', unitW:'16mm', label:'Medium',      cls:'t-med'};
+  if(n===5) return {font:'12pt', head:'11pt', pad:'3.5mm', title:'20pt', idxW:'9mm',  rateW:'30mm', textW:'22mm', unitW:'14mm', label:'Comfortable', cls:'t-med'};
+  if(n===6) return {font:'10pt', head:'10pt', pad:'2.5mm', title:'18pt', idxW:'9mm',  rateW:'26mm', textW:'19mm', unitW:'13mm', label:'Compact',     cls:'t-sm'};
+  return     {font:'9pt',  head:'9pt',  pad:'2mm',   title:'17pt', idxW:'8mm',  rateW:'23mm', textW:'17mm', unitW:'12mm', label:'Standard',    cls:'t-sm'};
 }
 
 function updatePLPreview(){
@@ -1774,14 +1773,15 @@ function doPLPrint(){
   const list = window._plPrintList || [];
   if(!list.length){closeM('mPLCols'); return}
 
+  // Shorter header labels so they fit without overflowing narrow columns
   const colDefs = [
-    {key:'name',  label:'Product',          align:'left',  get:p=>esc(p.name)},
-    {key:'brand', label:'Brand',            align:'left',  get:p=>esc(p.co||'—')},
-    {key:'cat',   label:'Category',         align:'left',  get:p=>esc(p.cat||'—')},
-    {key:'unit',  label:'Unit',             align:'left',  get:p=>esc(p.uom||'Pcs')},
-    {key:'pp',    label:'Purchase Rate \u20b9',  align:'right', get:p=>'\u20b9'+parseFloat(p.pp||0).toFixed(2)},
-    {key:'rp',    label:'Retail Rate \u20b9',    align:'right', get:p=>'\u20b9'+parseFloat(p.rp||0).toFixed(2)},
-    {key:'wp',    label:'Wholesale Rate \u20b9', align:'right', get:p=>'\u20b9'+parseFloat(p.wp||0).toFixed(2)}
+    {key:'name',  label:'Product',      align:'left',  get:p=>esc(p.name)},
+    {key:'brand', label:'Brand',        align:'left',  get:p=>esc(p.co||'\u2014')},
+    {key:'cat',   label:'Category',     align:'left',  get:p=>esc(p.cat||'\u2014')},
+    {key:'unit',  label:'Unit',         align:'left',  get:p=>esc(p.uom||'Pcs')},
+    {key:'pp',    label:'Purchase \u20b9', align:'right', get:p=>'\u20b9'+parseFloat(p.pp||0).toFixed(2)},
+    {key:'rp',    label:'Retail \u20b9',   align:'right', get:p=>'\u20b9'+parseFloat(p.rp||0).toFixed(2)},
+    {key:'wp',    label:'Wholesale \u20b9',align:'right', get:p=>'\u20b9'+parseFloat(p.wp||0).toFixed(2)}
   ];
   const sel = colDefs.filter(c=>document.getElementById('plc_'+c.key)?.checked);
   if(!sel.length){toast('Select at least one column','error');return}
@@ -1792,17 +1792,18 @@ function doPLPrint(){
   try{localStorage.setItem('plPrintCols', JSON.stringify(saved))}catch{}
 
   const t = plFontTier(sel.length);
-
-  // Fixed widths for every column EXCEPT name — name gets the remainder
   const COL_W = {brand:t.textW, cat:t.textW, unit:t.unitW, pp:t.rateW, rp:t.rateW, wp:t.rateW};
 
+  // Headers: fixed-width cols get explicit width; name col takes the rest
+  // No white-space:nowrap on headers — let them wrap to a 2nd line if needed
   const headRow =
     `<th style="width:${t.idxW};text-align:center;white-space:nowrap">#</th>` +
     sel.map(c => c.key==='name'
       ? `<th style="text-align:left">${c.label}</th>`
-      : `<th style="width:${COL_W[c.key]};text-align:${c.align};white-space:nowrap">${c.label}</th>`
+      : `<th style="width:${COL_W[c.key]};text-align:${c.align}">${c.label}</th>`
     ).join('');
 
+  // Data rows: rate cols nowrap so ₹ values never break mid-number; name col wraps freely
   const bodyRows = list.map((p,i)=>
     `<tr>` +
     `<td style="text-align:center;font-weight:600;white-space:nowrap">${i+1}</td>` +
@@ -1814,14 +1815,14 @@ function doPLPrint(){
     `</tr>`
   ).join('');
 
-  // Use pt + mm — absolute units, identical output on Windows, Mac, Linux
-  // !important ensures these override the default .pl-pr rules regardless of cascade order
+  // pt + mm = absolute units identical on all OS/browsers
+  // !important overrides global .pl-pr rules regardless of cascade order
   const scaleStyle = `<style>
-    .pl-pr h1{font-size:${t.title}!important}
-    .pl-pr .pl-dt{font-size:7pt!important;margin-bottom:${sel.length<=3?'6mm':'4mm'}!important}
+    .pl-pr h1{font-size:${t.title}!important;margin-bottom:3mm!important}
+    .pl-pr .pl-dt{font-size:8pt!important;margin-bottom:${sel.length<=3?'6mm':'3mm'}!important}
     .pl-pr table{font-size:${t.font}!important;table-layout:fixed!important;width:190mm!important;border-collapse:collapse!important}
-    .pl-pr th{padding:${t.pad}!important;font-size:${t.head}!important;font-weight:700!important;white-space:nowrap}
-    .pl-pr td{padding:${t.pad}!important;line-height:1.3!important}
+    .pl-pr th{padding:${t.pad}!important;font-size:${t.head}!important;font-weight:700!important;vertical-align:bottom!important;word-break:break-word!important;overflow-wrap:break-word!important}
+    .pl-pr td{padding:${t.pad}!important;line-height:1.3!important;overflow:hidden!important}
     @media print{
       .pl-pr{width:190mm!important}
       .pl-pr table{font-size:${t.font}!important;table-layout:fixed!important;width:190mm!important}
