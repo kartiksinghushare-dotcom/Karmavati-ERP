@@ -1742,14 +1742,14 @@ function plcSetAll(v){
 
 function plFontTier(n){
   // n = number of data columns chosen (excluding the # index column)
-  // All sizes in pt / mm — absolute print units, same on Mac & Windows
-  if(n<=1)  return {font:'26pt', head:'24pt', pad:'8mm',   title:'32pt', idxW:'12mm', rateW:'55mm', textW:'40mm', unitW:'24mm', label:'Extra Large', cls:'t-big'};
-  if(n===2) return {font:'20pt', head:'18pt', pad:'7mm',   title:'28pt', idxW:'11mm', rateW:'46mm', textW:'34mm', unitW:'21mm', label:'Very Large',  cls:'t-big'};
-  if(n===3) return {font:'16pt', head:'15pt', pad:'5mm',   title:'24pt', idxW:'10mm', rateW:'38mm', textW:'28mm', unitW:'18mm', label:'Large',       cls:'t-big'};
-  if(n===4) return {font:'14pt', head:'13pt', pad:'4.5mm', title:'22pt', idxW:'10mm', rateW:'38mm', textW:'25mm', unitW:'16mm', label:'Medium',      cls:'t-med'};
-  if(n===5) return {font:'12pt', head:'11pt', pad:'3.5mm', title:'20pt', idxW:'9mm',  rateW:'30mm', textW:'22mm', unitW:'14mm', label:'Comfortable', cls:'t-med'};
-  if(n===6) return {font:'10pt', head:'10pt', pad:'2.5mm', title:'18pt', idxW:'9mm',  rateW:'26mm', textW:'19mm', unitW:'13mm', label:'Compact',     cls:'t-sm'};
-  return     {font:'9pt',  head:'9pt',  pad:'2mm',   title:'17pt', idxW:'8mm',  rateW:'23mm', textW:'17mm', unitW:'12mm', label:'Standard',    cls:'t-sm'};
+  // rateW is sized to fit "₹99999.00" + padding only — product name gets the rest
+  if(n<=1)  return {font:'26pt', head:'24pt', pad:'8mm',   title:'32pt', idxW:'12mm', rateW:'57mm', textW:'40mm', unitW:'24mm', label:'Extra Large', cls:'t-big'};
+  if(n===2) return {font:'20pt', head:'18pt', pad:'7mm',   title:'28pt', idxW:'11mm', rateW:'44mm', textW:'33mm', unitW:'20mm', label:'Very Large',  cls:'t-big'};
+  if(n===3) return {font:'16pt', head:'15pt', pad:'5mm',   title:'24pt', idxW:'10mm', rateW:'34mm', textW:'26mm', unitW:'17mm', label:'Large',       cls:'t-big'};
+  if(n===4) return {font:'14pt', head:'13pt', pad:'4.5mm', title:'22pt', idxW:'10mm', rateW:'30mm', textW:'22mm', unitW:'15mm', label:'Medium',      cls:'t-med'};
+  if(n===5) return {font:'12pt', head:'11pt', pad:'3.5mm', title:'20pt', idxW:'9mm',  rateW:'25mm', textW:'19mm', unitW:'13mm', label:'Comfortable', cls:'t-med'};
+  if(n===6) return {font:'10pt', head:'10pt', pad:'2.5mm', title:'18pt', idxW:'9mm',  rateW:'22mm', textW:'17mm', unitW:'12mm', label:'Compact',     cls:'t-sm'};
+  return     {font:'9pt',  head:'9pt',  pad:'2mm',   title:'17pt', idxW:'8mm',  rateW:'19mm', textW:'15mm', unitW:'11mm', label:'Standard',    cls:'t-sm'};
 }
 
 function updatePLPreview(){
@@ -1773,15 +1773,15 @@ function doPLPrint(){
   const list = window._plPrintList || [];
   if(!list.length){closeM('mPLCols'); return}
 
-  // Shorter header labels so they fit without overflowing narrow columns
+  // ₹ symbol removed from headers — already present in every data cell
   const colDefs = [
-    {key:'name',  label:'Product',      align:'left',  get:p=>esc(p.name)},
-    {key:'brand', label:'Brand',        align:'left',  get:p=>esc(p.co||'\u2014')},
-    {key:'cat',   label:'Category',     align:'left',  get:p=>esc(p.cat||'\u2014')},
-    {key:'unit',  label:'Unit',         align:'left',  get:p=>esc(p.uom||'Pcs')},
-    {key:'pp',    label:'Purchase \u20b9', align:'right', get:p=>'\u20b9'+parseFloat(p.pp||0).toFixed(2)},
-    {key:'rp',    label:'Retail \u20b9',   align:'right', get:p=>'\u20b9'+parseFloat(p.rp||0).toFixed(2)},
-    {key:'wp',    label:'Wholesale \u20b9',align:'right', get:p=>'\u20b9'+parseFloat(p.wp||0).toFixed(2)}
+    {key:'name',  label:'Product',    align:'left',  get:p=>esc(p.name)},
+    {key:'brand', label:'Brand',      align:'left',  get:p=>esc(p.co||'\u2014')},
+    {key:'cat',   label:'Category',   align:'left',  get:p=>esc(p.cat||'\u2014')},
+    {key:'unit',  label:'Unit',       align:'left',  get:p=>esc(p.uom||'Pcs')},
+    {key:'pp',    label:'Purchase',   align:'right', get:p=>'\u20b9'+parseFloat(p.pp||0).toFixed(2)},
+    {key:'rp',    label:'Retail',     align:'right', get:p=>'\u20b9'+parseFloat(p.rp||0).toFixed(2)},
+    {key:'wp',    label:'Wholesale',  align:'right', get:p=>'\u20b9'+parseFloat(p.wp||0).toFixed(2)}
   ];
   const sel = colDefs.filter(c=>document.getElementById('plc_'+c.key)?.checked);
   if(!sel.length){toast('Select at least one column','error');return}
