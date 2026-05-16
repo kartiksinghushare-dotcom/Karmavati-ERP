@@ -248,7 +248,7 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
 
 /* ── PRODUCT AUTOCOMPLETE DROPDOWN ── */
 .ac-wrap{position:relative}
-.ac-drop{display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border:1.5px solid var(--gold);border-radius:var(--r);box-shadow:var(--sh2);z-index:500;max-height:200px;overflow-y:auto;margin-top:2px}
+.ac-drop{display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border:1.5px solid var(--gold);border-radius:var(--r);box-shadow:var(--sh3);z-index:9000;max-height:240px;overflow-y:auto;margin-top:2px}
 .ac-drop.open{display:block}
 .ac-item{padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--bord2);display:flex;flex-direction:column;gap:2px}
 .ac-item:last-child{border-bottom:none}
@@ -364,6 +364,17 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
 .pl-pr th{background:#1a1410;color:#fff;padding:6px 8px;text-align:left}
 .pl-pr td{padding:5px 8px;border-bottom:1px solid #e0d5c8}
 .pl-pr tr:nth-child(even) td{background:#f7f3ee}
+/* ── PRICE LIST PRINT — column picker ── */
+.plc-row{display:flex;align-items:center;gap:9px;cursor:pointer;padding:10px 12px;border:1.5px solid var(--bord);border-radius:8px;font-size:14px;font-weight:500;color:var(--ink1,var(--ink));background:var(--surf);transition:background .15s,border-color .15s,box-shadow .15s;user-select:none}
+.plc-row:hover{background:#fff;border-color:var(--ink3)}
+.plc-row input{width:17px;height:17px;cursor:pointer;accent-color:#1A1410;flex-shrink:0}
+.plc-row input:checked + span{color:var(--ink);font-weight:600}
+.plc-row:has(input:checked){background:#fff;border-color:var(--ink);box-shadow:0 1px 3px rgba(26,20,16,.06)}
+.plc-tier{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-left:6px}
+.plc-tier.t-big{background:var(--gnd);color:var(--gn)}
+.plc-tier.t-med{background:var(--bld);color:var(--bl)}
+.plc-tier.t-sm{background:var(--goldd);color:var(--gold)}
+.plc-tier.t-no{background:var(--rdd);color:var(--rd)}
 /* ── BARCODE LABELS — Zebra printer ── */
 .z-sheet{margin:0;padding:0;background:#fff}
 .z-grid{display:flex;flex-wrap:wrap;gap:0}
@@ -776,6 +787,34 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
     <div class="fgrp"><label class="flbl">Brand Name <span class="req">*</span></label><input class="fc" id="brandN" placeholder="e.g. Havells, Anchor, Polycab"></div>
   </div>
   <div class="md-f"><button class="btn btn-ou" onclick="closeM('mBrand')">Cancel</button><button class="btn btn-dk" onclick="saveBrand()">Save Brand</button></div>
+</div></div>
+
+<!-- PRICE LIST — PRINT COLUMN PICKER -->
+<div class="mo" id="mPLCols"><div class="md md-sm">
+  <div class="md-h"><div class="md-t">🖨 Print Price List</div><button class="md-c" onclick="closeM('mPLCols')">✕</button></div>
+  <div class="md-b">
+    <div style="font-size:13px;color:var(--ink2);margin-bottom:14px;line-height:1.5">
+      Pick the columns you want on paper. <strong>Fewer columns = bigger, easier-to-read text.</strong>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <label class="plc-row"><input type="checkbox" id="plc_name" checked onchange="updatePLPreview()"><span>📦 Product Name</span></label>
+      <label class="plc-row"><input type="checkbox" id="plc_brand" onchange="updatePLPreview()"><span>🏷️ Brand</span></label>
+      <label class="plc-row"><input type="checkbox" id="plc_cat" onchange="updatePLPreview()"><span>📂 Category</span></label>
+      <label class="plc-row"><input type="checkbox" id="plc_unit" onchange="updatePLPreview()"><span>📐 Unit</span></label>
+      <label class="plc-row"><input type="checkbox" id="plc_pp" checked onchange="updatePLPreview()"><span>💰 Purchase Rate ₹</span></label>
+      <label class="plc-row"><input type="checkbox" id="plc_rp" checked onchange="updatePLPreview()"><span>🛒 Retail Rate ₹</span></label>
+      <label class="plc-row" style="grid-column:1/-1"><input type="checkbox" id="plc_wp" checked onchange="updatePLPreview()"><span>📦 Wholesale Rate ₹</span></label>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button type="button" class="btn btn-ou btn-sm" onclick="plcSetAll(true)" style="flex:1">Select All</button>
+      <button type="button" class="btn btn-ou btn-sm" onclick="plcSetAll(false)" style="flex:1">Clear All</button>
+    </div>
+    <div id="plcPreview" style="margin-top:14px;padding:12px 14px;background:var(--surf);border:1px solid var(--bord2);border-radius:8px;font-size:13px;color:var(--ink2);text-align:center;line-height:1.6"></div>
+  </div>
+  <div class="md-f">
+    <button class="btn btn-ou" onclick="closeM('mPLCols')">Cancel</button>
+    <button class="btn btn-dk" id="plcPrintBtn" onclick="doPLPrint()">🖨 Print Now</button>
+  </div>
 </div></div>
 
 <!-- SALE MODAL -->
@@ -1480,6 +1519,44 @@ function renderAcDrop(i, val){
     </div>`).join('');
   drop._items=items;
   drop.classList.add('open');
+  positionAcDrop(i);
+}
+
+// Pin the dropdown with position:fixed so it escapes the items-table overflow clip
+// and the .tot-bar stacking. Re-anchor it to the input each time it's shown.
+function positionAcDrop(i){
+  const drop=document.getElementById('acd_'+i);
+  const inp=document.getElementById('sn_'+i);
+  if(!drop||!inp||!drop.classList.contains('open'))return;
+  const r=inp.getBoundingClientRect();
+  const itemsCount=(drop._items||[]).length;
+  const desiredH=Math.min(240, itemsCount*54+6);
+  const spaceBelow=window.innerHeight-r.bottom-12;
+  const spaceAbove=r.top-12;
+  let top,maxH;
+  if(spaceBelow>=desiredH || spaceBelow>=spaceAbove){
+    top=r.bottom+2; maxH=Math.min(desiredH,Math.max(120,spaceBelow));
+  } else {
+    maxH=Math.min(desiredH,Math.max(120,spaceAbove));
+    top=r.top-maxH-2;
+  }
+  drop.style.position='fixed';
+  drop.style.top=top+'px';
+  drop.style.left=r.left+'px';
+  drop.style.right='auto';
+  drop.style.width=r.width+'px';
+  drop.style.maxHeight=maxH+'px';
+}
+
+// Bind once: any scroll (including modal-body / table wrapper) or resize re-anchors all open drops
+if(!window._acScrollBound){
+  const reanchor=()=>document.querySelectorAll('.ac-drop.open').forEach(d=>{
+    const m=d.id.match(/^acd_(\d+)$/);
+    if(m) positionAcDrop(parseInt(m[1],10));
+  });
+  document.addEventListener('scroll', reanchor, true); // capture catches nested scrollers
+  window.addEventListener('resize', reanchor);
+  window._acScrollBound=true;
 }
 
 function showAcDrop(i,val){renderAcDrop(i,val)}
@@ -1635,22 +1712,115 @@ function printPL(){
   const prods=gP();
   const list=_plSel.size>0?prods.filter(p=>_plSel.has(p.id)):prods;
   if(!list.length){toast('No products selected','error');return}
-  const rows=list.map((p,i)=>`<tr>
-    <td>${i+1}</td><td>${esc(p.name)}</td><td>${esc(p.co||'—')}</td><td>${esc(p.cat||'—')}</td>
-    <td>${esc(p.uom||'Pcs')}</td>
-    <td>₹${parseFloat(p.pp||0).toFixed(2)}</td>
-    <td>₹${parseFloat(p.rp||0).toFixed(2)}</td>
-    <td>₹${parseFloat(p.wp||0).toFixed(2)}</td>
-  </tr>`).join('');
-  doPrint(`<div class="pl-pr">
+  // Restore saved column preferences (default: Product + Purchase/Retail/Wholesale rates)
+  // Version stamp — bumped to 2 so users on older defaults see the new ones once.
+  const PL_PREFS_VER = 2;
+  const defaults={name:true,brand:false,cat:false,unit:false,pp:true,rp:true,wp:true};
+  let saved=null;
+  try{
+    const raw=JSON.parse(localStorage.getItem('plPrintCols')||'null');
+    if(raw && raw.__v===PL_PREFS_VER) saved=raw;
+  }catch{}
+  const prefs=saved||defaults;
+  ['name','brand','cat','unit','pp','rp','wp'].forEach(k=>{
+    const cb=document.getElementById('plc_'+k);
+    if(cb) cb.checked = (k in prefs) ? !!prefs[k] : !!defaults[k];
+  });
+  // Stash list so doPLPrint can use it
+  window._plPrintList = list;
+  updatePLPreview();
+  openM('mPLCols');
+}
+
+function plcSetAll(v){
+  ['name','brand','cat','unit','pp','rp','wp'].forEach(k=>{
+    const cb=document.getElementById('plc_'+k);
+    if(cb) cb.checked=v;
+  });
+  updatePLPreview();
+}
+
+function plFontTier(n){
+  // n = number of data columns chosen (excluding the # index column)
+  if(n<=1)  return {font:30, head:24, pad:16, title:34, label:'Extra Large', cls:'t-big'};
+  if(n===2) return {font:24, head:22, pad:13, title:30, label:'Very Large',  cls:'t-big'};
+  if(n===3) return {font:19, head:19, pad:11, title:26, label:'Large',       cls:'t-big'};
+  if(n===4) return {font:16, head:16, pad:9,  title:24, label:'Medium',      cls:'t-med'};
+  if(n===5) return {font:14, head:14, pad:8,  title:22, label:'Comfortable', cls:'t-med'};
+  if(n===6) return {font:12, head:13, pad:7,  title:20, label:'Compact',     cls:'t-sm'};
+  return     {font:11, head:12, pad:6,  title:20, label:'Standard',    cls:'t-sm'};
+}
+
+function updatePLPreview(){
+  const keys=['name','brand','cat','unit','pp','rp','wp'];
+  const n=keys.filter(k=>document.getElementById('plc_'+k)?.checked).length;
+  const lbl=document.getElementById('plcPreview');
+  const btn=document.getElementById('plcPrintBtn');
+  if(!lbl) return;
+  if(n===0){
+    lbl.innerHTML=`<span class="plc-tier t-no">Nothing selected</span><br><span style="font-size:12px">Tick at least one column to print</span>`;
+    if(btn){btn.disabled=true;btn.style.opacity='.5';btn.style.cursor='not-allowed'}
+    return;
+  }
+  const t=plFontTier(n);
+  const rowCount = (window._plPrintList||[]).length;
+  lbl.innerHTML = `<strong>${n} column${n===1?'':'s'}</strong> · ${rowCount} product${rowCount===1?'':'s'} <span class="plc-tier ${t.cls}">${t.label} · ~${t.font}px</span><br><span style="font-size:12px">Text size will scale automatically on the printed page</span>`;
+  if(btn){btn.disabled=false;btn.style.opacity='';btn.style.cursor=''}
+}
+
+function doPLPrint(){
+  const list = window._plPrintList || [];
+  if(!list.length){closeM('mPLCols'); return}
+
+  const colDefs = [
+    {key:'name',  label:'Product',          align:'left',  get:p=>esc(p.name)},
+    {key:'brand', label:'Brand',            align:'left',  get:p=>esc(p.co||'—')},
+    {key:'cat',   label:'Category',         align:'left',  get:p=>esc(p.cat||'—')},
+    {key:'unit',  label:'Unit',             align:'left',  get:p=>esc(p.uom||'Pcs')},
+    {key:'pp',    label:'Purchase Rate ₹',  align:'right', get:p=>'₹'+parseFloat(p.pp||0).toFixed(2)},
+    {key:'rp',    label:'Retail Rate ₹',    align:'right', get:p=>'₹'+parseFloat(p.rp||0).toFixed(2)},
+    {key:'wp',    label:'Wholesale Rate ₹', align:'right', get:p=>'₹'+parseFloat(p.wp||0).toFixed(2)}
+  ];
+  const sel = colDefs.filter(c=>document.getElementById('plc_'+c.key)?.checked);
+  if(!sel.length){toast('Select at least one column','error');return}
+
+  // Save preference for next time
+  const saved={__v:2};
+  colDefs.forEach(c=>{saved[c.key]=!!document.getElementById('plc_'+c.key)?.checked});
+  try{localStorage.setItem('plPrintCols', JSON.stringify(saved))}catch{}
+
+  const t = plFontTier(sel.length);
+
+  const headRow = `<th style="width:${sel.length<=2?44:36}px;text-align:center">#</th>` +
+    sel.map(c=>`<th style="text-align:${c.align}">${c.label}</th>`).join('');
+
+  const bodyRows = list.map((p,i)=>
+    `<tr><td style="text-align:center;font-weight:600">${i+1}</td>` +
+    sel.map(c=>`<td style="text-align:${c.align}${c.align==='right'?';font-weight:600':''}">${c.get(p)}</td>`).join('') +
+    `</tr>`
+  ).join('');
+
+  // Scoped style override — wins over the default .pl-pr rules because it comes after them
+  const scaleStyle = `<style>
+    .pl-pr h1{font-size:${t.title}px;margin-bottom:4px}
+    .pl-pr .pl-dt{font-size:${Math.max(11, Math.round(t.font*0.75))}px;margin-bottom:${sel.length<=3?20:14}px}
+    .pl-pr table{font-size:${t.font}px}
+    .pl-pr th{padding:${t.pad+2}px ${t.pad+4}px;font-size:${t.head}px;font-weight:700}
+    .pl-pr td{padding:${t.pad}px ${t.pad+4}px;line-height:1.35}
+    @media print{
+      .pl-pr table{font-size:${t.font}px}
+      .pl-pr th, .pl-pr td{page-break-inside:avoid}
+      .pl-pr tr{page-break-inside:avoid}
+    }
+  </style>`;
+
+  closeM('mPLCols');
+
+  doPrint(scaleStyle + `<div class="pl-pr">
     <h1>${esc(ST.coName||'Store')}</h1>
     <div class="pl-dt">Price List — ${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})}</div>
-    <table><thead><tr>
-      <th>#</th><th>Product</th><th>Brand</th><th>Category</th>
-      <th>Unit</th>
-      <th>Purchase Rate ₹</th><th>Retail Rate ₹</th><th>Wholesale Rate ₹</th>
-    </tr></thead><tbody>${rows}</tbody></table>
-    <p style="text-align:center;font-size:11px;color:#888;margin-top:14px">Prices subject to change · ${esc(ST.coName)}</p>
+    <table><thead><tr>${headRow}</tr></thead><tbody>${bodyRows}</tbody></table>
+    <p style="text-align:center;font-size:${Math.max(10, Math.round(t.font*0.7))}px;color:#888;margin-top:14px">Prices subject to change · ${esc(ST.coName)}</p>
   </div>`,{size:'a4'});
 }
 
