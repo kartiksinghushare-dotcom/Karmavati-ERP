@@ -1741,14 +1741,16 @@ function plcSetAll(v){
 }
 
 function plFontTier(n){
+  // All sizes in absolute print units (pt / mm) — renders identically on Windows & Mac
   // n = number of data columns chosen (excluding the # index column)
-  if(n<=1)  return {font:30, head:24, pad:16, title:34, label:'Extra Large', cls:'t-big'};
-  if(n===2) return {font:24, head:22, pad:13, title:30, label:'Very Large',  cls:'t-big'};
-  if(n===3) return {font:19, head:19, pad:11, title:26, label:'Large',       cls:'t-big'};
-  if(n===4) return {font:16, head:16, pad:9,  title:24, label:'Medium',      cls:'t-med'};
-  if(n===5) return {font:14, head:14, pad:8,  title:22, label:'Comfortable', cls:'t-med'};
-  if(n===6) return {font:12, head:13, pad:7,  title:20, label:'Compact',     cls:'t-sm'};
-  return     {font:11, head:12, pad:6,  title:20, label:'Standard',    cls:'t-sm'};
+  // rateW = width for ₹ columns | textW = width for brand/cat | unitW = width for unit col
+  if(n<=1)  return {font:'22pt', head:'20pt', pad:'6mm',   title:'28pt', idxW:'10mm', rateW:'45mm', textW:'34mm', unitW:'20mm', label:'Extra Large', cls:'t-big'};
+  if(n===2) return {font:'16pt', head:'15pt', pad:'5mm',   title:'24pt', idxW:'10mm', rateW:'38mm', textW:'28mm', unitW:'17mm', label:'Very Large',  cls:'t-big'};
+  if(n===3) return {font:'13pt', head:'13pt', pad:'4mm',   title:'22pt', idxW:'9mm',  rateW:'30mm', textW:'23mm', unitW:'15mm', label:'Large',       cls:'t-big'};
+  if(n===4) return {font:'11pt', head:'11pt', pad:'3mm',   title:'20pt', idxW:'9mm',  rateW:'27mm', textW:'21mm', unitW:'14mm', label:'Medium',      cls:'t-med'};
+  if(n===5) return {font:'9pt',  head:'9pt',  pad:'2.5mm', title:'18pt', idxW:'8mm',  rateW:'24mm', textW:'19mm', unitW:'13mm', label:'Comfortable', cls:'t-med'};
+  if(n===6) return {font:'8pt',  head:'8pt',  pad:'2mm',   title:'17pt', idxW:'8mm',  rateW:'22mm', textW:'17mm', unitW:'12mm', label:'Compact',     cls:'t-sm'};
+  return     {font:'7.5pt', head:'7.5pt', pad:'1.5mm', title:'16pt', idxW:'8mm',  rateW:'20mm', textW:'16mm', unitW:'11mm', label:'Standard',    cls:'t-sm'};
 }
 
 function updatePLPreview(){
@@ -1764,7 +1766,7 @@ function updatePLPreview(){
   }
   const t=plFontTier(n);
   const rowCount = (window._plPrintList||[]).length;
-  lbl.innerHTML = `<strong>${n} column${n===1?'':'s'}</strong> · ${rowCount} product${rowCount===1?'':'s'} <span class="plc-tier ${t.cls}">${t.label} · ~${t.font}px</span><br><span style="font-size:12px">Text size will scale automatically on the printed page</span>`;
+  lbl.innerHTML = `<strong>${n} column${n===1?'':'s'}</strong> · ${rowCount} product${rowCount===1?'':'s'} <span class="plc-tier ${t.cls}">${t.label} · ${t.font}</span><br><span style="font-size:12px">Text size will scale automatically on the printed page</span>`;
   if(btn){btn.disabled=false;btn.style.opacity='';btn.style.cursor=''}
 }
 
@@ -1777,9 +1779,9 @@ function doPLPrint(){
     {key:'brand', label:'Brand',            align:'left',  get:p=>esc(p.co||'—')},
     {key:'cat',   label:'Category',         align:'left',  get:p=>esc(p.cat||'—')},
     {key:'unit',  label:'Unit',             align:'left',  get:p=>esc(p.uom||'Pcs')},
-    {key:'pp',    label:'Purchase Rate ₹',  align:'right', get:p=>'₹'+parseFloat(p.pp||0).toFixed(2)},
-    {key:'rp',    label:'Retail Rate ₹',    align:'right', get:p=>'₹'+parseFloat(p.rp||0).toFixed(2)},
-    {key:'wp',    label:'Wholesale Rate ₹', align:'right', get:p=>'₹'+parseFloat(p.wp||0).toFixed(2)}
+    {key:'pp',    label:'Purchase Rate \u20b9',  align:'right', get:p=>'\u20b9'+parseFloat(p.pp||0).toFixed(2)},
+    {key:'rp',    label:'Retail Rate \u20b9',    align:'right', get:p=>'\u20b9'+parseFloat(p.rp||0).toFixed(2)},
+    {key:'wp',    label:'Wholesale Rate \u20b9', align:'right', get:p=>'\u20b9'+parseFloat(p.wp||0).toFixed(2)}
   ];
   const sel = colDefs.filter(c=>document.getElementById('plc_'+c.key)?.checked);
   if(!sel.length){toast('Select at least one column','error');return}
@@ -1791,26 +1793,39 @@ function doPLPrint(){
 
   const t = plFontTier(sel.length);
 
-  const headRow = `<th style="width:${sel.length<=2?44:36}px;text-align:center">#</th>` +
-    sel.map(c=>`<th style="text-align:${c.align}">${c.label}</th>`).join('');
+  // Fixed widths for every column EXCEPT name — name gets the remainder
+  const COL_W = {brand:t.textW, cat:t.textW, unit:t.unitW, pp:t.rateW, rp:t.rateW, wp:t.rateW};
+
+  const headRow =
+    `<th style="width:${t.idxW};text-align:center;white-space:nowrap">#</th>` +
+    sel.map(c => c.key==='name'
+      ? `<th style="text-align:left">${c.label}</th>`
+      : `<th style="width:${COL_W[c.key]};text-align:${c.align};white-space:nowrap">${c.label}</th>`
+    ).join('');
 
   const bodyRows = list.map((p,i)=>
-    `<tr><td style="text-align:center;font-weight:600">${i+1}</td>` +
-    sel.map(c=>`<td style="text-align:${c.align}${c.align==='right'?';font-weight:600':''}">${c.get(p)}</td>`).join('') +
+    `<tr>` +
+    `<td style="text-align:center;font-weight:600;white-space:nowrap">${i+1}</td>` +
+    sel.map(c => {
+      const ws = c.key==='name' ? 'word-break:break-word;overflow-wrap:break-word;' : 'white-space:nowrap;';
+      const fw = c.align==='right' ? 'font-weight:600;' : '';
+      return `<td style="${ws}${fw}text-align:${c.align}">${c.get(p)}</td>`;
+    }).join('') +
     `</tr>`
   ).join('');
 
-  // Scoped style override — wins over the default .pl-pr rules because it comes after them
+  // Use pt + mm — absolute units, identical output on Windows, Mac, Linux
+  // !important ensures these override the default .pl-pr rules regardless of cascade order
   const scaleStyle = `<style>
-    .pl-pr h1{font-size:${t.title}px;margin-bottom:4px}
-    .pl-pr .pl-dt{font-size:${Math.max(11, Math.round(t.font*0.75))}px;margin-bottom:${sel.length<=3?20:14}px}
-    .pl-pr table{font-size:${t.font}px}
-    .pl-pr th{padding:${t.pad+2}px ${t.pad+4}px;font-size:${t.head}px;font-weight:700}
-    .pl-pr td{padding:${t.pad}px ${t.pad+4}px;line-height:1.35}
+    .pl-pr h1{font-size:${t.title}!important}
+    .pl-pr .pl-dt{font-size:7pt!important;margin-bottom:${sel.length<=3?'6mm':'4mm'}!important}
+    .pl-pr table{font-size:${t.font}!important;table-layout:fixed!important;width:190mm!important;border-collapse:collapse!important}
+    .pl-pr th{padding:${t.pad}!important;font-size:${t.head}!important;font-weight:700!important;white-space:nowrap}
+    .pl-pr td{padding:${t.pad}!important;line-height:1.3!important}
     @media print{
-      .pl-pr table{font-size:${t.font}px}
-      .pl-pr th, .pl-pr td{page-break-inside:avoid}
-      .pl-pr tr{page-break-inside:avoid}
+      .pl-pr{width:190mm!important}
+      .pl-pr table{font-size:${t.font}!important;table-layout:fixed!important;width:190mm!important}
+      .pl-pr tr{page-break-inside:avoid!important}
     }
   </style>`;
 
@@ -1818,9 +1833,9 @@ function doPLPrint(){
 
   doPrint(scaleStyle + `<div class="pl-pr">
     <h1>${esc(ST.coName||'Store')}</h1>
-    <div class="pl-dt">Price List — ${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})}</div>
+    <div class="pl-dt">Price List \u2014 ${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})}</div>
     <table><thead><tr>${headRow}</tr></thead><tbody>${bodyRows}</tbody></table>
-    <p style="text-align:center;font-size:${Math.max(10, Math.round(t.font*0.7))}px;color:#888;margin-top:14px">Prices subject to change · ${esc(ST.coName)}</p>
+    <p style="text-align:center;font-size:7pt;color:#888;margin-top:4mm">Prices subject to change \u00b7 ${esc(ST.coName)}</p>
   </div>`,{size:'a4'});
 }
 
