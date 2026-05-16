@@ -562,7 +562,7 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
         </div>
       </div></div>
       <div class="card"><div class="card-b0"><div class="tw">
-        <table><thead><tr><th style="min-width:165px" data-i18n="th.barcode">Barcode</th><th data-i18n="th.productname">Product Name</th><th data-i18n="th.brand">Brand</th><th data-i18n="th.category">Category</th><th data-i18n="th.unit">Unit</th><th style="min-width:90px" data-i18n="th.purchaserate">Purchase Rate ₹</th><th style="min-width:90px" data-i18n="th.retailrate">Retail Rate ₹</th><th style="min-width:90px" data-i18n="th.wholesalerate">Wholesale Rate ₹</th><th data-i18n="th.actions">Actions</th></tr></thead>
+        <table><thead><tr><th style="min-width:165px" data-i18n="th.barcode">Barcode</th><th data-i18n="th.productname">Product Name</th><th data-i18n="th.brand">Brand</th><th data-i18n="th.category">Category</th><th data-i18n="th.unit">Unit</th><th style="min-width:90px" data-i18n="th.purchaserate">Purchase Rate ₹</th><th style="min-width:90px" data-i18n="th.wholesalerate">Wholesale Rate ₹</th><th style="min-width:90px" data-i18n="th.retailrate">Retail Rate ₹</th><th data-i18n="th.actions">Actions</th></tr></thead>
         <tbody id="prodTb"></tbody></table>
       </div></div></div>
     </div>
@@ -609,8 +609,8 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
           <th style="width:40px"><input type="checkbox" id="plCA" onchange="plTogAll(this.checked)" style="cursor:pointer;width:15px;height:15px"></th>
           <th data-i18n="th.productname">Product</th><th data-i18n="th.brand">Brand</th><th data-i18n="th.category">Category</th><th data-i18n="th.unit">Unit</th>
           <th style="min-width:90px" data-i18n="th.purchaserate">Purchase Rate ₹</th>
-          <th style="min-width:90px" data-i18n="th.retailrate">Retail Rate ₹</th>
           <th style="min-width:90px" data-i18n="th.wholesalerate">Wholesale Rate ₹</th>
+          <th style="min-width:90px" data-i18n="th.retailrate">Retail Rate ₹</th>
         </tr></thead>
         <tbody id="plTb"></tbody></table>
       </div></div></div>
@@ -687,8 +687,8 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
       <div class="mb4"><div class="fsec">Pricing (Rate Card)</div>
         <div class="fg fg3">
           <div class="fgrp"><label class="flbl">Purchase Rate ₹ (Cost Price) <span class="req">*</span></label><input class="fc" id="pPP" type="number" min="0" placeholder="e.g. 150"></div>
-          <div class="fgrp"><label class="flbl">Retail Selling Rate ₹ (MRP) <span class="req">*</span></label><input class="fc" id="pRP" type="number" min="0" placeholder="e.g. 200"></div>
           <div class="fgrp"><label class="flbl">Wholesale Selling Rate ₹ (Trade) <span class="req">*</span></label><input class="fc" id="pWP" type="number" min="0" placeholder="e.g. 180"></div>
+          <div class="fgrp"><label class="flbl">Retail Selling Rate ₹ (MRP) <span class="req">*</span></label><input class="fc" id="pRP" type="number" min="0" placeholder="e.g. 200"></div>
         </div>
       </div>
     </div>
@@ -751,7 +751,7 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
     <div class="md-h"><div class="md-t">Import Products via CSV</div><button class="md-c" onclick="closeM('mCSV')">✕</button></div>
     <div class="md-b">
       <div style="background:var(--gnd);border:1px solid var(--gnb);border-radius:var(--r);padding:12px 14px;font-size:12.5px;color:var(--gn);margin-bottom:16px">
-        📋 <strong>Columns:</strong> Barcode (optional), Product Name, Brand, Category, Unit, Purchase Rate, Retail Rate, Wholesale Rate<br>
+        📋 <strong>Columns:</strong> Barcode (optional), Product Name, Brand, Category, Unit, Purchase Rate, Wholesale Rate, Retail Rate<br>
         <span style="font-size:11.5px;color:var(--ink2);margin-top:4px;display:block">
           ✅ Leave <strong>Barcode blank</strong> — a unique one will be auto-generated.<br>
           ✅ Lines starting with <strong>#</strong> are treated as comments and ignored.<br>
@@ -802,8 +802,8 @@ input:checked+.tog-sl:before{transform:translateX(20px)}
       <label class="plc-row"><input type="checkbox" id="plc_cat" onchange="updatePLPreview()"><span>📂 Category</span></label>
       <label class="plc-row"><input type="checkbox" id="plc_unit" onchange="updatePLPreview()"><span>📐 Unit</span></label>
       <label class="plc-row"><input type="checkbox" id="plc_pp" checked onchange="updatePLPreview()"><span>💰 Purchase Rate ₹</span></label>
-      <label class="plc-row"><input type="checkbox" id="plc_rp" checked onchange="updatePLPreview()"><span>🛒 Retail Rate ₹</span></label>
-      <label class="plc-row" style="grid-column:1/-1"><input type="checkbox" id="plc_wp" checked onchange="updatePLPreview()"><span>📦 Wholesale Rate ₹</span></label>
+      <label class="plc-row"><input type="checkbox" id="plc_wp" checked onchange="updatePLPreview()"><span>📦 Wholesale Rate ₹</span></label>
+      <label class="plc-row" style="grid-column:1/-1"><input type="checkbox" id="plc_rp" checked onchange="updatePLPreview()"><span>🛒 Retail Rate ₹</span></label>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px">
       <button type="button" class="btn btn-ou btn-sm" onclick="plcSetAll(true)" style="flex:1">Select All</button>
@@ -1315,8 +1315,8 @@ function renderProds(){
     <td>${p.cat?`<span class="badge b-bl">${esc(p.cat)}</span>`:'—'}</td>
     <td><span class="badge b-nt">${esc(p.uom||'Pcs')}</span></td>
     <td>${priceInput(p.id,'pp',p.pp,'pp','pi')}</td>
-    <td>${priceInput(p.id,'rp',p.rp,'rp','pi')}</td>
     <td>${priceInput(p.id,'wp',p.wp,'wp','pi')}</td>
+    <td>${priceInput(p.id,'rp',p.rp,'rp','pi')}</td>
     <td><div style="display:flex;gap:6px"><button class="btn btn-ou btn-sm" onclick="openProdModal('${p.id}')">Edit</button><button class="btn btn-rd btn-sm" onclick="delProd('${p.id}')">✕</button></div></td>
   </tr>`).join('');
   setTimeout(()=>list.forEach(p=>{const el=document.getElementById('bc_'+p.id);if(el)try{JsBarcode(el,p.bc||'000000000000',{format:'CODE128',width:1.4,height:36,displayValue:false,margin:2,background:'#fff',lineColor:'#1a1410'})}catch{}}),60);
@@ -1700,8 +1700,8 @@ function renderPL(){
     <td>${p.cat?`<span class="badge b-bl">${esc(p.cat)}</span>`:'—'}</td>
     <td><span class="badge b-nt">${esc(p.uom||'Pcs')}</span></td>
     <td>${priceInput(p.id,'pp',p.pp,'pp','pl')}</td>
-    <td>${priceInput(p.id,'rp',p.rp,'rp','pl')}</td>
     <td>${priceInput(p.id,'wp',p.wp,'wp','pl')}</td>
+    <td>${priceInput(p.id,'rp',p.rp,'rp','pl')}</td>
   </tr>`).join('')||'<tr><td colspan="8"><div class="empty"><p>No products match</p></div></td></tr>';
 }
 function plTog(id,c){if(c)_plSel.add(id);else _plSel.delete(id)}
@@ -1741,16 +1741,15 @@ function plcSetAll(v){
 }
 
 function plFontTier(n){
-  // n = number of data columns chosen (excluding the # index column)
-  // pad is tight — large font + small padding = readable text + fewer pages
-  // rateW sized to fit "₹99999.00" content only — product name gets the rest
-  if(n<=1)  return {font:'26pt', head:'24pt', pad:'2mm',   title:'32pt', idxW:'12mm', rateW:'57mm', textW:'40mm', unitW:'24mm', label:'Extra Large', cls:'t-big'};
-  if(n===2) return {font:'20pt', head:'18pt', pad:'2mm',   title:'28pt', idxW:'11mm', rateW:'44mm', textW:'33mm', unitW:'20mm', label:'Very Large',  cls:'t-big'};
-  if(n===3) return {font:'16pt', head:'15pt', pad:'1.5mm', title:'24pt', idxW:'10mm', rateW:'34mm', textW:'26mm', unitW:'17mm', label:'Large',       cls:'t-big'};
-  if(n===4) return {font:'14pt', head:'13pt', pad:'1.5mm', title:'22pt', idxW:'10mm', rateW:'30mm', textW:'22mm', unitW:'15mm', label:'Medium',      cls:'t-med'};
-  if(n===5) return {font:'12pt', head:'11pt', pad:'1mm',   title:'20pt', idxW:'9mm',  rateW:'25mm', textW:'19mm', unitW:'13mm', label:'Comfortable', cls:'t-med'};
-  if(n===6) return {font:'10pt', head:'10pt', pad:'1mm',   title:'18pt', idxW:'9mm',  rateW:'22mm', textW:'17mm', unitW:'12mm', label:'Compact',     cls:'t-sm'};
-  return     {font:'9pt',  head:'9pt',  pad:'1mm',   title:'17pt', idxW:'8mm',  rateW:'19mm', textW:'15mm', unitW:'11mm', label:'Standard',    cls:'t-sm'};
+  // n = number of data columns (excluding # index)
+  // fonts kept readable; rateW minimal to fit "₹99999.00"; name col gets the rest
+  if(n<=1)  return {font:'24pt', head:'22pt', pad:'2mm',   title:'28pt', idxW:'11mm', rateW:'52mm', textW:'36mm', unitW:'21mm', label:'Extra Large', cls:'t-big'};
+  if(n===2) return {font:'18pt', head:'16pt', pad:'2mm',   title:'24pt', idxW:'10mm', rateW:'40mm', textW:'30mm', unitW:'18mm', label:'Very Large',  cls:'t-big'};
+  if(n===3) return {font:'14pt', head:'13pt', pad:'1.5mm', title:'20pt', idxW:'10mm', rateW:'30mm', textW:'23mm', unitW:'15mm', label:'Large',       cls:'t-big'};
+  if(n===4) return {font:'12pt', head:'11pt', pad:'1.5mm', title:'18pt', idxW:'9mm',  rateW:'25mm', textW:'19mm', unitW:'13mm', label:'Medium',      cls:'t-med'};
+  if(n===5) return {font:'10pt', head:'10pt', pad:'1mm',   title:'16pt', idxW:'9mm',  rateW:'22mm', textW:'17mm', unitW:'12mm', label:'Comfortable', cls:'t-med'};
+  if(n===6) return {font:'9pt',  head:'9pt',  pad:'1mm',   title:'15pt', idxW:'8mm',  rateW:'19mm', textW:'15mm', unitW:'11mm', label:'Compact',     cls:'t-sm'};
+  return     {font:'8pt',  head:'8pt',  pad:'1mm',   title:'14pt', idxW:'8mm',  rateW:'17mm', textW:'13mm', unitW:'10mm', label:'Standard',    cls:'t-sm'};
 }
 
 function updatePLPreview(){
@@ -1781,8 +1780,8 @@ function doPLPrint(){
     {key:'cat',   label:'Category',   align:'left',  get:p=>esc(p.cat||'\u2014')},
     {key:'unit',  label:'Unit',       align:'left',  get:p=>esc(p.uom||'Pcs')},
     {key:'pp',    label:'Purchase',   align:'right', get:p=>'\u20b9'+parseFloat(p.pp||0).toFixed(2)},
-    {key:'rp',    label:'Retail',     align:'right', get:p=>'\u20b9'+parseFloat(p.rp||0).toFixed(2)},
-    {key:'wp',    label:'Wholesale',  align:'right', get:p=>'\u20b9'+parseFloat(p.wp||0).toFixed(2)}
+    {key:'wp',    label:'Wholesale',  align:'right', get:p=>'\u20b9'+parseFloat(p.wp||0).toFixed(2)},
+    {key:'rp',    label:'Retail',     align:'right', get:p=>'\u20b9'+parseFloat(p.rp||0).toFixed(2)}
   ];
   const sel = colDefs.filter(c=>document.getElementById('plc_'+c.key)?.checked);
   if(!sel.length){toast('Select at least one column','error');return}
@@ -1800,7 +1799,7 @@ function doPLPrint(){
               `background:#1a1410;color:#fff;text-align:left;vertical-align:bottom;`+
               `word-break:break-word;overflow-wrap:break-word;border:none`;
   const TD = `padding:${t.pad};font-size:${t.font};font-family:Arial,sans-serif;`+
-             `line-height:1.15;overflow:hidden;border-bottom:1px solid #e0d5c8`;
+             `line-height:1.2;border-bottom:1px solid #e0d5c8`;
   const TDA= TD+`;background:#f7f3ee`; // alternating row
 
   const headRow =
@@ -1965,7 +1964,7 @@ function exportProducts(){
     CSV_HEADERS.map(q).join(',')
   ];
   prods.forEach(p=>{
-    rows.push([q(p.bc),q(p.name),q(p.co||''),q(p.cat||''),q(p.uom||'Piece'),q(p.pp||0),q(p.rp||0),q(p.wp||0)].join(','));
+    rows.push([q(p.bc),q(p.name),q(p.co||''),q(p.cat||''),q(p.uom||'Piece'),q(p.pp||0),q(p.wp||0),q(p.rp||0)].join(','));
   });
   const blob=new Blob(['\uFEFF'+rows.join('\r\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
