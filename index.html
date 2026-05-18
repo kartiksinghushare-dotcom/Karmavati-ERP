@@ -1693,6 +1693,8 @@ function renderPL(){
   document.getElementById('plCoF').innerHTML='<option value="">All</option>'+cos.map(c=>`<option value="${esc(c)}"${c===co?' selected':''}>${esc(c)}</option>`).join('');
   let list=prods.filter(p=>{if(!matchSearch(q,p))return false;return(!cat||p.cat===cat)&&(!co||p.co===co)});
   const[sf,sd]=srt.split('-');list.sort((a,b)=>{const av=sf==='name'?(a.name||''):(sf==='rp'?(a.rp||0):(a.wp||0)),bv=sf==='name'?(b.name||''):(sf==='rp'?(b.rp||0):(b.wp||0));return sd==='asc'?(av>bv?1:-1):(av<bv?1:-1)});
+  // Store the current sorted+filtered list so printPL uses the same order
+  window._plCurrentList = list;
   document.getElementById('plTb').innerHTML=list.map(p=>`<tr>
     <td><input type="checkbox" style="cursor:pointer;width:15px;height:15px" ${_plSel.has(p.id)?'checked':''} onchange="plTog('${p.id}',this.checked)"></td>
     <td><div style="font-weight:600">${esc(p.name)}</div></td>
@@ -1709,8 +1711,9 @@ function plTogAll(c){gP().forEach(p=>c?_plSel.add(p.id):_plSel.delete(p.id));ren
 function plSelAll(){document.getElementById('plCA').checked=true;plTogAll(true)}
 function plClrAll(){document.getElementById('plCA').checked=false;plTogAll(false)}
 function printPL(){
-  const prods=gP();
-  const list=_plSel.size>0?prods.filter(p=>_plSel.has(p.id)):prods;
+  // Use the currently sorted+filtered list from renderPL (respects sort order & filters)
+  const sortedList = window._plCurrentList || gP();
+  const list = _plSel.size>0 ? sortedList.filter(p=>_plSel.has(p.id)) : sortedList;
   if(!list.length){toast('No products selected','error');return}
   // Restore saved column preferences (default: Product + Purchase/Retail/Wholesale rates)
   // Version stamp — bumped to 2 so users on older defaults see the new ones once.
